@@ -41,9 +41,6 @@
         .btn-proses { background: #059669; color: white; font-weight: 700; padding: 0.75rem; border-radius: 0.75rem; width: 100%; cursor: pointer; margin-top: 1rem; }
         .btn-proses:hover { background: #047857; }
         
-        /* Tombol Baru */
-        .btn-scan-nota { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 0.75rem; border-radius: 0.75rem; width: 100%; cursor: pointer; margin-top: 1rem; font-weight: 600; }
-        
         .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
         .toggle-bg { width: 2.75rem; height: 1.5rem; background: #334155; border-radius: 9999px; relative; position: relative; cursor: pointer; }
         .toggle-bg::after { content: ''; position: absolute; top: 2px; left: 2px; background: #cbd5e1; width: 1.25rem; height: 1.25rem; border-radius: 50%; transition: all 0.2s; }
@@ -98,11 +95,12 @@
                         <option value="plisket">Plisket</option>
                         <option value="spiral">Spiral</option>
                         <option value="tabtop">Tab Top</option>
+                        <option value="blind">Blind</option>
                     </select>
                 </div>
 
                 <div class="mb-4">
-                    <label class="text-xs font-bold text-slate-400 mb-2 block uppercase">Harga Kain per Meter (Rp)</label>
+                    <label class="text-xs font-bold text-slate-400 mb-2 block uppercase">Harga Kain/Blind per Meter (Rp)</label>
                     <input type="number" id="hargaKainManual">
                 </div>
 
@@ -138,14 +136,9 @@
 
             <!-- List Antrean -->
             <div class="col-list flex" style="flex-direction: column; justify-content: space-between;">
-                <div id="welcomeState" class="border-dashed p-4 text-center flex" style="flex-direction:column; justify-content:center; align-items:center; min-height:300px; border-radius:1rem; height:100%;">
+                <div id="welcomeState" class="border-dashed p-4 text-center flex" style="flex-direction:column; justify-content:center; align-items:center; min-h-[300px]; border-radius:1rem; height:100%;">
                     <i class="fa-solid fa-receipt text-slate-500" style="font-size: 2.5rem; margin-bottom:1rem;"></i>
-                    <h3 style="color:#94a3b8; font-weight:700; margin-bottom: 1rem;">Belum Ada Hitungan</h3>
-                    
-                    <!-- Tombol Scan Ditambahkan Di Sini -->
-                    <button type="button" onclick="window.location.href='invoice.html'" class="btn-scan-nota">
-                        <i class="fa-solid fa-qrcode"></i> Scan / Input Nota Pelunasan
-                    </button>
+                    <h3 style="color:#94a3b8; font-weight:700;">Belum Ada Hitungan</h3>
                 </div>
 
                 <div id="resultState" class="bg-slate-800 hidden" style="height:100%; display:flex; flex-direction:column; justify-content:space-between; border-radius:1rem;">
@@ -160,11 +153,6 @@
                         <div style="color:#94a3b8; font-size:12px; font-weight:600;">Total Akumulasi Gorden:</div>
                         <div id="grandTotal" class="text-indigo-400 font-bold" style="font-size:1.75rem; margin-bottom:1rem;">Rp 0</div>
                         <button type="button" onclick="bukaFormInvoice()" class="btn-proses"><i class="fa-solid fa-file-invoice"></i> Buat Invoice Sekarang</button>
-                        
-                        <!-- Tombol Scan Juga Ditambahkan di bawah tombol Invoice agar selalu ada -->
-                        <button type="button" onclick="window.location.href='invoice.html'" class="btn-scan-nota">
-                            <i class="fa-solid fa-qrcode"></i> Scan / Input Nota Pelunasan
-                        </button>
                     </div>
                 </div>
             </div>
@@ -207,37 +195,45 @@
             let hargaKainInput = parseFloat(document.getElementById('hargaKainManual').value);
             let hargaVitraseInput = parseFloat(document.getElementById('hargaVitraseManual').value) || 0;
 
-            if (!lebar || !tinggi || isNaN(hargaKainInput)) { alert("Mohon isi ukuran Lebar, Tinggi dan Harga Kain."); return; }
+            if (!lebar || !tinggi || isNaN(hargaKainInput)) { alert("Mohon isi ukuran Lebar, Tinggi dan Harga."); return; }
 
             let totalSatuJendela = 0;
-            let meterKainUtama = (jenisKain === 'import') ? (lebar + 0.2) * 3 : Math.ceil((lebar + 0.2) / 0.4) * (tinggi + 0.3);
-            if (modelGorden === 'tabtop') meterKainUtama += 1;
-            totalSatuJendela += (meterKainUtama * hargaKainInput) + (meterKainUtama * HARGA.jahit);
 
-            if (modelGorden === 'smokring') {
-                let jmlSmokring = Math.ceil(lebar * 24); if (jmlSmokring % 2 !== 0) jmlSmokring += 1;
-                totalSatuJendela += (jmlSmokring * HARGA.smokring) + (Math.max(1, Math.ceil(lebar)) * HARGA.rollet) + HARGA.hook + HARGA.tali;
-            } else if (modelGorden === 'plisket') {
-                totalSatuJendela += (Math.max(1, Math.ceil(lebar)) * HARGA.rell) + HARGA.hook + HARGA.tali;
-            } else if (modelGorden === 'spiral') { totalSatuJendela += HARGA.stick; }
-            else if (modelGorden === 'tabtop') { totalSatuJendela += (Math.max(1, Math.ceil(lebar)) * HARGA.rollet) + HARGA.hook + HARGA.tali; }
+            if (modelGorden === 'blind') {
+                // Rumus Blind: L (min 1m) * T (min 1m) * Harga
+                totalSatuJendela = Math.max(1, lebar) * Math.max(1, tinggi) * hargaKainInput;
+            } else {
+                let meterKainUtama = (jenisKain === 'import') ? (lebar + 0.2) * 3 : Math.ceil((lebar + 0.2) / 0.4) * (tinggi + 0.3);
+                if (modelGorden === 'tabtop') meterKainUtama += 1;
+                totalSatuJendela += (meterKainUtama * hargaKainInput) + (meterKainUtama * HARGA.jahit);
 
-            if (pakaiVitrase) {
-                if (modelVitrase === 'spiral') {
-                    let lSpiral = parseFloat(document.getElementById('lebarSpiral').value) || lebar;
-                    let qSpiral = parseInt(document.getElementById('qtySpiral').value) || 1;
-                    let meterVitraseSpiral = (lSpiral + 0.2) * 3 * qSpiral;
-                    totalSatuJendela += (meterVitraseSpiral * hargaVitraseInput) + (meterVitraseSpiral * HARGA.jahit) + (HARGA.stick * qSpiral * 2);
-                } else {
-                    let meterVitrase = (lebar + 0.2) * 3;
-                    totalSatuJendela += (meterVitrase * hargaVitraseInput) + (meterVitrase * HARGA.jahit) + (Math.max(1, Math.ceil(lebar)) * HARGA.rell);
+                if (modelGorden === 'smokring') {
+                    let jmlSmokring = Math.ceil(lebar * 24); if (jmlSmokring % 2 !== 0) jmlSmokring += 1;
+                    totalSatuJendela += (jmlSmokring * HARGA.smokring) + (Math.max(1, Math.ceil(lebar)) * HARGA.rollet) + HARGA.hook + HARGA.tali;
+                } else if (modelGorden === 'plisket') {
+                    totalSatuJendela += (Math.max(1, Math.ceil(lebar)) * HARGA.rell) + HARGA.hook + HARGA.tali;
+                } else if (modelGorden === 'spiral') { totalSatuJendela += HARGA.stick; }
+                else if (modelGorden === 'tabtop') { totalSatuJendela += (Math.max(1, Math.ceil(lebar)) * HARGA.rollet) + HARGA.hook + HARGA.tali; }
+
+                if (pakaiVitrase) {
+                    if (modelVitrase === 'spiral') {
+                        let lSpiral = parseFloat(document.getElementById('lebarSpiral').value) || lebar;
+                        let qSpiral = parseInt(document.getElementById('qtySpiral').value) || 1;
+                        let meterVitraseSpiral = (lSpiral + 0.2) * 3 * qSpiral;
+                        totalSatuJendela += (meterVitraseSpiral * hargaVitraseInput) + (meterVitraseSpiral * HARGA.jahit) + (HARGA.stick * qSpiral * 2);
+                    } else {
+                        let meterVitrase = (lebar + 0.2) * 3;
+                        totalSatuJendela += (meterVitrase * hargaVitraseInput) + (meterVitrase * HARGA.jahit) + (Math.max(1, Math.ceil(lebar)) * HARGA.rell);
+                    }
                 }
             }
+            
+            // Tambahkan Biaya Instalasi untuk semua model (termasuk Blind)
             totalSatuJendela += Math.max(1, Math.ceil(lebar)) * HARGA.instalasi;
 
             daftarJendela.push({
-                nama: `Gorden ${modelGorden.toUpperCase()} (Jndl ${daftarJendela.length + 1})`,
-                spesifikasi: `L:${lebar.toFixed(2)}m x T:${tinggi.toFixed(2)}m Bahan:${jenisKain.toUpperCase()}`,
+                nama: `Gorden/Blind ${modelGorden.toUpperCase()} (Jndl ${daftarJendela.length + 1})`,
+                spesifikasi: `L:${lebar.toFixed(2)}m x T:${tinggi.toFixed(2)}m ${modelGorden !== 'blind' ? 'Bahan:'+jenisKain.toUpperCase() : ''}`,
                 harga: totalSatuJendela
             });
 
@@ -273,27 +269,11 @@
         }
     </script>
     <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Gagal:', err));
-    });
-  }
-</script>
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').then(reg => {
-      reg.addEventListener('updatefound', () => {
-        const newWorker = reg.installing;
-        newWorker.addEventListener('statechange', () => {
-          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            // Jika ada versi baru, beri tahu user atau langsung reload otomatis
-            window.location.reload(); 
-          }
-        });
-      });
-    });
-  }
-</script>
-
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Gagal:', err));
+            });
+        }
+    </script>
 </body>
 </html>
