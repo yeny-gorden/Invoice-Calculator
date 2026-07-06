@@ -60,7 +60,6 @@
         </div>
 
         <div class="grid">
-            <!-- Form Input -->
             <div class="col-form bg-slate-800">
                 <h2 class="text-white font-bold mb-4" style="font-size: 1.125rem;"><i class="fa-solid fa-sliders text-indigo-400"></i> Input Dimensi Jendela</h2>
                 <div class="flex gap-4 mb-4" style="gap: 1rem;">
@@ -100,11 +99,10 @@
                 </div>
 
                 <div class="mb-4">
-                    <label class="text-xs font-bold text-slate-400 mb-2 block uppercase">Harga Kain/Blind per Meter (Rp)</label>
+                    <label class="text-xs font-bold text-slate-400 mb-2 block uppercase">Harga Kain per Meter (Rp)</label>
                     <input type="number" id="hargaKainManual">
                 </div>
 
-                <!-- Vitrase Toggle -->
                 <div class="mb-4" style="border-top: 1px solid #334155; padding-top: 1rem;">
                     <div class="flex items-center justify-between p-3 rounded-xl" style="background: rgba(15, 23, 42, 0.6);">
                         <span class="text-sm font-bold text-white">Tambahkan Vitrase?</span>
@@ -134,7 +132,6 @@
                 <button type="button" onclick="hitungGorden()" class="btn-hitung"><i class="fa-solid fa-plus"></i> Hitung & Tambahkan Item</button>
             </div>
 
-            <!-- List Antrean -->
             <div class="col-list flex" style="flex-direction: column; justify-content: space-between;">
                 <div id="welcomeState" class="border-dashed p-4 text-center flex" style="flex-direction:column; justify-content:center; align-items:center; min-h-[300px]; border-radius:1rem; height:100%;">
                     <i class="fa-solid fa-receipt text-slate-500" style="font-size: 2.5rem; margin-bottom:1rem;"></i>
@@ -200,7 +197,7 @@
             let totalSatuJendela = 0;
 
             if (modelGorden === 'blind') {
-                // Rumus Blind: L (min 1m) * T (min 1m) * Harga
+                // Rumus Blind: L (minimal 1m) * T (minimal 1m) * Harga
                 totalSatuJendela = Math.max(1, lebar) * Math.max(1, tinggi) * hargaKainInput;
             } else {
                 let meterKainUtama = (jenisKain === 'import') ? (lebar + 0.2) * 3 : Math.ceil((lebar + 0.2) / 0.4) * (tinggi + 0.3);
@@ -228,12 +225,12 @@
                 }
             }
             
-            // Tambahkan Biaya Instalasi untuk semua model (termasuk Blind)
+            // Tambahkan Biaya Instalasi (berlaku untuk semua)
             totalSatuJendela += Math.max(1, Math.ceil(lebar)) * HARGA.instalasi;
 
             daftarJendela.push({
                 nama: `Gorden/Blind ${modelGorden.toUpperCase()} (Jndl ${daftarJendela.length + 1})`,
-                spesifikasi: `L:${lebar.toFixed(2)}m x T:${tinggi.toFixed(2)}m ${modelGorden !== 'blind' ? 'Bahan:'+jenisKain.toUpperCase() : ''}`,
+                spesifikasi: `L:${lebar.toFixed(2)}m x T:${tinggi.toFixed(2)}m`,
                 harga: totalSatuJendela
             });
 
@@ -269,11 +266,12 @@
         }
     </script>
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Gagal:', err));
-            });
-        }
-    </script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Gagal:', err));
+    });
+  }
+</script>
+
 </body>
 </html>
