@@ -279,6 +279,21 @@
     });
   }
 </script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // Jika ada versi baru, beri tahu user atau langsung reload otomatis
+            window.location.reload(); 
+          }
+        });
+      });
+    });
+  }
+</script>
 
 </body>
 </html>
