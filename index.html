@@ -41,6 +41,9 @@
         .btn-proses { background: #059669; color: white; font-weight: 700; padding: 0.75rem; border-radius: 0.75rem; width: 100%; cursor: pointer; margin-top: 1rem; }
         .btn-proses:hover { background: #047857; }
         
+        /* Tombol Baru */
+        .btn-scan-nota { background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 0.75rem; border-radius: 0.75rem; width: 100%; cursor: pointer; margin-top: 1rem; font-weight: 600; }
+        
         .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
         .toggle-bg { width: 2.75rem; height: 1.5rem; background: #334155; border-radius: 9999px; relative; position: relative; cursor: pointer; }
         .toggle-bg::after { content: ''; position: absolute; top: 2px; left: 2px; background: #cbd5e1; width: 1.25rem; height: 1.25rem; border-radius: 50%; transition: all 0.2s; }
@@ -135,9 +138,14 @@
 
             <!-- List Antrean -->
             <div class="col-list flex" style="flex-direction: column; justify-content: space-between;">
-                <div id="welcomeState" class="border-dashed p-4 text-center flex" style="flex-direction:column; justify-content:center; align-items:center; min-h-[300px]; border-radius:1rem; height:100%;">
+                <div id="welcomeState" class="border-dashed p-4 text-center flex" style="flex-direction:column; justify-content:center; align-items:center; min-height:300px; border-radius:1rem; height:100%;">
                     <i class="fa-solid fa-receipt text-slate-500" style="font-size: 2.5rem; margin-bottom:1rem;"></i>
-                    <h3 style="color:#94a3b8; font-weight:700;">Belum Ada Hitungan</h3>
+                    <h3 style="color:#94a3b8; font-weight:700; margin-bottom: 1rem;">Belum Ada Hitungan</h3>
+                    
+                    <!-- Tombol Scan Ditambahkan Di Sini -->
+                    <button type="button" onclick="window.location.href='invoice.html'" class="btn-scan-nota">
+                        <i class="fa-solid fa-qrcode"></i> Scan / Input Nota Pelunasan
+                    </button>
                 </div>
 
                 <div id="resultState" class="bg-slate-800 hidden" style="height:100%; display:flex; flex-direction:column; justify-content:space-between; border-radius:1rem;">
@@ -152,6 +160,11 @@
                         <div style="color:#94a3b8; font-size:12px; font-weight:600;">Total Akumulasi Gorden:</div>
                         <div id="grandTotal" class="text-indigo-400 font-bold" style="font-size:1.75rem; margin-bottom:1rem;">Rp 0</div>
                         <button type="button" onclick="bukaFormInvoice()" class="btn-proses"><i class="fa-solid fa-file-invoice"></i> Buat Invoice Sekarang</button>
+                        
+                        <!-- Tombol Scan Juga Ditambahkan di bawah tombol Invoice agar selalu ada -->
+                        <button type="button" onclick="window.location.href='invoice.html'" class="btn-scan-nota">
+                            <i class="fa-solid fa-qrcode"></i> Scan / Input Nota Pelunasan
+                        </button>
                     </div>
                 </div>
             </div>
