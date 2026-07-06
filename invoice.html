@@ -7,119 +7,333 @@
     
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/png" href="./logo.png">
+    <link rel="apple-touch-icon" href="./logo.png">
     <meta name="theme-color" content="#9a3412">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
-    
     <style>
-        :root { --primary: #0f172a; --accent: #9a3412; --success: #166534; --border: #94a3b8; --bg-light: #f8fafc; }
-        body { font-family: 'Inter', sans-serif; margin: 0; padding: 40px 20px; background-color: #cbd5e1; color: #1e293b; }
+        :root {
+            --primary: #0f172a;       
+            --accent: #9a3412;        
+            --success: #166534;       
+            --text-main: #1e293b;     
+            --bg-light: #f8fafc;
+            --border: #94a3b8;        
+        }
         
-        .invoice-container { max-width: 850px; margin: 0 auto; background: #ffffff; padding: 50px; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); position: relative; }
-        
-        /* Header */
-        .invoice-header { display: flex; justify-content: space-between; border-bottom: 3px solid var(--primary); padding-bottom: 30px; margin-bottom: 35px; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            background-color: #cbd5e1;
+            color: var(--text-main);
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        #login-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #0f172a;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-box {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .login-box h2 { margin: 0 0 10px 0; color: var(--primary); font-weight: 800; }
+        .login-box p { color: #64748b; font-size: 14px; margin: 0 0 25px 0; }
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .login-box button {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .invoice-container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .stamp-lunas {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            border: 6px double #dc2626;
+            color: #dc2626;
+            font-size: 70px;
+            font-weight: 900;
+            padding: 10px 40px;
+            border-radius: 15px;
+            opacity: 0.18;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            pointer-events: none;
+            display: none;
+            z-index: 99;
+        }
+
+        .invoice-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid var(--primary); padding-bottom: 30px; margin-bottom: 35px; }
         .brand-section h1 { margin: 0; font-size: 36px; font-weight: 800; color: var(--primary); }
-        .invoice-meta-title h2 { margin: 0; color: var(--accent); }
-        .meta-inputs input { border: 1px solid #ccc; padding: 4px; width: 150px; }
-
-        /* Form Table */
-        table { width: 100%; border-collapse: collapse; margin-bottom: 25px; border: 2px solid var(--primary); }
-        th { background-color: var(--primary); color: #ffffff; padding: 10px; }
-        td { padding: 10px; border-bottom: 2px solid #e2e8f0; }
-        td input { width: 100%; border: none; }
-
-        /* Pencarian Manual */
-        .manual-search-box { max-width: 850px; margin: 20px auto; background: #fff; padding: 15px; border-radius: 12px; border: 1px solid var(--border); display: flex; gap: 10px; }
+        .nib-text { color: var(--accent) !important; font-weight: 700 !important; margin-top: 4px !important; }
+        .invoice-meta-title h2 { margin: 0 0 10px 0; font-size: 30px; font-weight: 800; color: var(--accent); }
+        .meta-inputs input { border: 1px solid transparent; text-align: right; font-size: 15px; font-weight: 700; background: transparent; width: 190px; }
         
-        /* Action Bar */
-        .action-bar { max-width: 850px; margin: 0 auto; display: flex; justify-content: space-between; gap: 10px; }
-        .btn { padding: 12px 20px; font-weight: 700; border-radius: 6px; cursor: pointer; border: none; }
-        .btn-scan { background-color: var(--primary); color: #fff; }
-        .btn-print { background-color: var(--accent); color: #fff; }
+        .details-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; margin-bottom: 40px; }
+        .info-card { background: var(--bg-light); padding: 20px; border-radius: 8px; border: 2px solid var(--border); }
+        .info-card h3 { margin: 0 0 12px 0; font-size: 13px; text-transform: uppercase; color: var(--accent); font-weight: 800; }
+        .info-card input, .info-card textarea { width: 100%; background: transparent; border: 1px solid transparent; font-size: 15px; font-weight: 600; color: var(--primary); }
+
+        table { width: 100%; border-collapse: collapse; margin-bottom: 25px; border: 2px solid var(--primary); }
+        th { background-color: var(--primary); color: #ffffff; padding: 14px 16px; font-size: 14px; font-weight: 700; text-transform: uppercase; }
+        td { padding: 14px 16px; border-bottom: 2px solid #e2e8f0; }
+        td input { width: 100%; border: 1px solid transparent; font-size: 15px; font-weight: 600; color: var(--primary); background: transparent; }
+        .align-right input { text-align: right; font-weight: 700; }
+
+        .invoice-summary-section { display: flex; justify-content: flex-end; }
+        .summary-box { width: 360px; border: 2px solid var(--border); padding: 15px; border-radius: 8px; background: var(--bg-light); }
+        .summary-row { display: flex; justify-content: space-between; padding: 10px 0; font-weight: 700; }
+        .summary-row input { text-align: right; border: 1px solid transparent; width: 150px; font-weight: 800; background: transparent; }
+        .grand-total-row { border-top: 3px solid var(--primary); margin-top: 8px; padding-top: 14px; font-size: 18px; font-weight: 800; }
+
+        .invoice-footer { margin-top: 60px; display: flex; justify-content: space-between; border-top: 2px dashed var(--border); padding-top: 30px; }
+        .terms { font-size: 13px; max-width: 420px; }
+        .signature-qr-wrap { display: flex; flex-direction: column; align-items: center; }
+        #qrcode { padding: 8px; background: #fff; border: 2px solid var(--primary); border-radius: 6px; }
+
+        /* MODAL SCANNER BARU */
+        #scanner-area {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 10000;
+            display: none; align-items: center; justify-content: center;
+        }
+        .scanner-modal { background: #fff; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; }
+        
+        .action-bar { max-width: 850px; margin: 25px auto 0 auto; display: flex; justify-content: space-between; }
+        .btn { padding: 12px 24px; font-size: 15px; font-weight: 700; border-radius: 6px; cursor: pointer; border: none; }
         .btn-add { background-color: #e2e8f0; color: var(--primary); }
+        .btn-print { background-color: var(--accent); color: #fff; }
+        .btn-scan { background-color: var(--primary); color: #fff; }
+        .btn-delete { background: transparent; color: #dc2626; font-size: 13px; font-weight: 700; }
+        
+        #status-badge { display: inline-block; padding: 6px 16px; border-radius: 50px; font-size: 13px; font-weight: 800; background-color: #fef3c7; color: #b45309; border: 1px solid #f59e0b; }
+        #active-cashier-info { font-size: 13px; font-weight: 700; background: #e2e8f0; padding: 4px 10px; border-radius: 4px; display: inline-block; }
     </style>
 </head>
 <body>
 
+<div id="login-screen">
+    <div class="login-box" id="box-auth">
+        <h2>KASIR LOGIN</h2>
+        <input type="text" id="login-id" placeholder="ID / Nama Kasir">
+        <input type="password" id="login-pin" placeholder="PIN">
+        <button onclick="prosesLogin()">Masuk Aplikasi</button>
+    </div>
+    <div class="login-box" id="box-ganti-pin" style="display: none;">
+        <h2>GANTI PIN</h2>
+        <input type="password" id="pin-baru-1" placeholder="PIN Baru">
+        <input type="password" id="pin-baru-2" placeholder="Ulangi PIN">
+        <button onclick="prosesGantiPIN()">Simpan</button>
+    </div>
+</div>
+
+<!-- CONTAINER SCANNER -->
+<div id="scanner-area">
+    <div class="scanner-modal" id="scanner-menu">
+        <h3 style="color: var(--accent);">Mode Kasir</h3>
+        <button class="btn btn-scan" style="width: 100%; margin-bottom: 10px;" onclick="pilihMetode('camera')">Scan QR Kamera</button>
+        <button class="btn btn-scan" style="width: 100%; background: #475569;" onclick="pilihMetode('manual')">Input No Nota Manual</button>
+        <button class="btn btn-delete" style="width: 100%; margin-top: 10px;" onclick="toggleScanner()">Tutup</button>
+    </div>
+    <div class="scanner-modal" id="reader-container" style="display: none;">
+        <div id="reader" style="width: 100%;"></div>
+        <button class="btn btn-delete" style="margin-top: 15px;" onclick="tutupKamera()">Kembali</button>
+    </div>
+</div>
+
 <div class="invoice-container">
+    <div id="stamp" class="stamp-lunas">LUNAS</div>
     <div class="invoice-header">
         <div class="brand-section">
             <h1>Yeny Gorden</h1>
             <p>Jl. Jendral Sudirman, Purwokerto</p>
+            <p class="nib-text">NIB: 3006260016473</p>
         </div>
         <div class="invoice-meta-title">
             <h2>INVOICE</h2>
             <div class="meta-inputs">
-                No Nota: <input type="text" id="nota-num" placeholder="No Nota">
+                <div>No Nota: <input type="text" id="nota-num" oninput="updateQRCode()"></div>
+                <div>Tanggal: <input type="date" id="date-picker"></div>
             </div>
+            <div id="status-badge">STATUS: BELUM LUNAS (DP)</div><br>
+            <div id="active-cashier-info">Kasir: <span id="txt-nama-kasir">-</span></div>
+        </div>
+    </div>
+
+    <div class="details-grid">
+        <div class="info-card">
+            <h3>Pelanggan:</h3>
+            <input type="text" id="client-name" placeholder="Nama Pelanggan" oninput="updateQRCode()">
+            <textarea id="client-address" rows="2" placeholder="Alamat"></textarea>
+        </div>
+        <div class="info-card">
+            <h3>Detail Proyek:</h3>
+            <textarea id="project-details" rows="4"></textarea>
         </div>
     </div>
 
     <table id="invoice-table">
         <thead>
             <tr>
-                <th>Deskripsi</th>
-                <th>Jumlah</th>
-                <th>Harga</th>
-                <th>Total</th>
+                <th style="width: 45%;">Deskripsi</th>
+                <th style="width: 10%;">Jml</th>
+                <th style="width: 20%;">Harga</th>
+                <th style="width: 20%;">Total</th>
+                <th style="width: 5%;"></th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td><input type="text" placeholder="Nama Barang"></td>
-                <td><input type="number" class="qty" value="0"></td>
-                <td><input type="number" class="price" value="0"></td>
-                <td><input type="number" class="row-total" value="0" readonly></td>
+                <td><input type="text" id="item-desc"></td>
+                <td class="align-right"><input type="number" class="qty" oninput="calculateTotal()"></td>
+                <td class="align-right"><input type="number" class="price" oninput="calculateTotal()"></td>
+                <td class="align-right"><input type="number" class="row-total" readonly></td>
+                <td><button class="btn btn-delete" onclick="removeRow(this)">Hapus</button></td>
             </tr>
         </tbody>
     </table>
+
+    <div class="invoice-summary-section">
+        <div class="summary-box">
+            <div class="summary-row"><span>Subtotal</span><div>Rp <input type="number" id="subtotal" readonly></div></div>
+            <div class="summary-row" style="color: #dc2626;"><span>Diskon</span><div>Rp <input type="number" id="discount-amount" oninput="calculateTotal()"></div></div>
+            <div class="summary-row" style="color: var(--success);"><span>DP</span><div>Rp <input type="number" id="dp-amount" oninput="calculateTotal()"></div></div>
+            <div class="summary-row grand-total-row"><span>Sisa</span><div style="color: var(--accent);">Rp <input type="number" id="balance-due" readonly></div></div>
+        </div>
+    </div>
+
+    <div class="invoice-footer">
+        <div class="terms"><p>Syarat: DP minimal 50%. Pengerjaan dimulai setelah DP.</p></div>
+        <div class="signature-qr-wrap"><div id="qrcode"></div></div>
+    </div>
 </div>
 
-<!-- TOMBOL PENCARIAN MANUAL -->
-<div class="manual-search-box">
-    <input type="text" id="manual-nota-input" placeholder="Masukkan nomor nota untuk mencari..." style="flex:1; padding: 8px;">
-    <button class="btn btn-scan" onclick="cariNotaManual()">Cari Nota</button>
-</div>
-
-<!-- TOMBOL AKSI -->
 <div class="action-bar">
     <div>
-        <button class="btn btn-scan" onclick="toggleScanner()">Mode Kasir: Scan QR</button>
+        <button class="btn btn-scan" onclick="toggleScanner()">Mode Kasir: Scan/Input Pelunasan</button>
         <button class="btn btn-add" onclick="addNewRow()">+ Tambah Baris</button>
     </div>
-    <button class="btn btn-print" onclick="window.print()">Cetak / Simpan PDF</button>
+    <button class="btn btn-print" onclick="simpanLaluCetak()">Cetak / Simpan PDF</button>
 </div>
 
 <script>
-    // Fungsi Pencarian Manual
-    function cariNotaManual() {
-        const nota = document.getElementById('manual-nota-input').value.trim();
-        if (!nota) { alert("Masukkan nomor nota!"); return; }
-        
-        // Sesuaikan URL_WEB_APP dengan URL Google Script Anda
-        fetch(`${URL_WEB_APP}?action=getNota&nota=${nota}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "success") {
-                alert("Nota ditemukan!");
-                // Panggil fungsi pengisian form Anda di sini
-                // isiDataKeForm(data.data);
-            } else {
-                alert("Nota tidak ditemukan.");
-            }
-        })
-        .catch(err => alert("Gagal mengambil data."));
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyiA6M_LsqfI_3Mu4Xd8M24MjUeFTuUmMF3AmXoWbdyo-iKUYmYaceECd9ivhBRVoA/exec";
+    let namaKasirAktif = "", isLunas = false, html5QrcodeScanner;
+
+    function toggleScanner() {
+        const area = document.getElementById('scanner-area');
+        area.style.display = (area.style.display === 'flex') ? 'none' : 'flex';
+        document.getElementById('scanner-menu').style.display = 'block';
+        document.getElementById('reader-container').style.display = 'none';
     }
 
-    // Enter Key Listener
-    document.getElementById('manual-nota-input').addEventListener("keyup", (e) => {
-        if (e.key === "Enter") cariNotaManual();
-    });
+    function pilihMetode(metode) {
+        if (metode === 'camera') {
+            document.getElementById('scanner-menu').style.display = 'none';
+            document.getElementById('reader-container').style.display = 'block';
+            runScanner();
+        } else {
+            const noNota = prompt("Masukkan Nomor Nota:");
+            if (noNota) {
+                alert("Mencari data untuk Nota: " + noNota + " (Integrasikan dengan API Sheets Anda)");
+                toggleScanner();
+            }
+        }
+    }
 
-    function addNewRow() { /* Kode tambah baris Anda */ }
-    function toggleScanner() { /* Kode buka scanner Anda */ }
+    function tutupKamera() {
+        if (html5QrcodeScanner) html5QrcodeScanner.stop().catch(() => {});
+        document.getElementById('scanner-menu').style.display = 'block';
+        document.getElementById('reader-container').style.display = 'none';
+    }
+
+    function runScanner() {
+        html5QrcodeScanner = new Html5Qrcode("reader");
+        html5QrcodeScanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
+            qrCodeMessage => {
+                alert("QR Terbaca: " + qrCodeMessage);
+                tutupKamera();
+                toggleScanner();
+            }).catch(err => alert("Gagal akses kamera: " + err));
+    }
+
+    // Fungsi-fungsi sistem lainnya tetap sama...
+    function generateNotaNumber() { const now = new Date(); return `YG-${now.getFullYear()}${now.getMonth()+1}${now.getDate()}-${now.getHours()}${now.getMinutes()}`; }
+    document.getElementById('nota-num').value = generateNotaNumber();
+    
+    var qrcode = new QRCode(document.getElementById("qrcode"), {width: 110, height: 110});
+
+    function calculateTotal() {
+        const rows = document.getElementById('invoice-table').getElementsByTagName('tbody')[0].rows;
+        let subtotal = 0;
+        for (let i = 0; i < rows.length; i++) {
+            const qty = parseFloat(rows[i].querySelector('.qty').value) || 0;
+            const price = parseFloat(rows[i].querySelector('.price').value) || 0;
+            rows[i].querySelector('.row-total').value = qty * price;
+            subtotal += (qty * price);
+        }
+        document.getElementById('subtotal').value = subtotal;
+        const disc = parseFloat(document.getElementById('discount-amount').value) || 0;
+        const dp = parseFloat(document.getElementById('dp-amount').value) || 0;
+        document.getElementById('balance-due').value = (subtotal - disc) - dp;
+        updateQRCode();
+    }
+
+    function updateQRCode() {
+        qrcode.clear();
+        qrcode.makeCode(JSON.stringify({ nota: document.getElementById('nota-num').value, total: document.getElementById('subtotal').value }));
+    }
+
+    function addNewRow() {
+        const row = document.getElementById('invoice-table').getElementsByTagName('tbody')[0].insertRow();
+        row.innerHTML = `<td><input type="text"></td><td><input type="number" class="qty" oninput="calculateTotal()"></td><td><input type="number" class="price" oninput="calculateTotal()"></td><td><input type="number" class="row-total" readonly></td><td><button class="btn btn-delete" onclick="removeRow(this)">Hapus</button></td>`;
+    }
+
+    function removeRow(btn) { btn.parentNode.parentNode.remove(); calculateTotal(); }
+    function prosesLogin() { document.getElementById('login-screen').style.display = 'none'; }
+    function simpanLaluCetak() { window.print(); }
 </script>
-
 </body>
 </html>
