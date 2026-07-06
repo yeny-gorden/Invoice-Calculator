@@ -34,6 +34,20 @@
             print-color-adjust: exact;
         }
 
+        /* --- TAMBAHAN: STYLE CUSTOM ALERT --- */
+        #custom-alert-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center;
+        }
+        .custom-alert-box {
+            background: #fff; padding: 25px; border-radius: 12px; width: 90%; max-width: 300px;
+            text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .custom-alert-box button {
+            margin-top: 20px; width: 100%; padding: 10px; background: var(--accent);
+            color: white; border: none; border-radius: 6px; font-weight: 700; cursor: pointer;
+        }
+
         /* --- STYLE SYSTEM LOGIN --- */
         #login-screen {
             position: fixed;
@@ -223,6 +237,14 @@
 </head>
 <body>
 
+<!-- TAMBAHAN: MODAL CUSTOM ALERT -->
+<div id="custom-alert-overlay">
+    <div class="custom-alert-box">
+        <div id="custom-alert-msg" style="font-weight: 600;"></div>
+        <button onclick="document.getElementById('custom-alert-overlay').style.display='none'">Oke</button>
+    </div>
+</div>
+
 <!-- SCREEN LOGIN (OVERLAY) -->
 <div id="login-screen">
     <div class="login-box" id="box-auth">
@@ -354,6 +376,12 @@
 </div>
 
 <script>
+    // FUNGSI CUSTOM ALERT
+    function showMsg(pesan) {
+        document.getElementById('custom-alert-msg').innerText = pesan;
+        document.getElementById('custom-alert-overlay').style.display = 'flex';
+    }
+
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
@@ -384,7 +412,7 @@
         const idKasir = document.getElementById('login-id').value.trim();
         const pinKasir = document.getElementById('login-pin').value.trim();
 
-        if (!idKasir || !pinKasir) { alert("ID Kasir dan PIN tidak boleh kosong!"); return; }
+        if (!idKasir || !pinKasir) { showMsg("ID Kasir dan PIN tidak boleh kosong!"); return; }
 
         const params = new URLSearchParams();
         params.append('action', 'login');
@@ -403,23 +431,23 @@
                     document.getElementById('box-ganti-pin').style.display = 'block';
                 } else {
                     document.getElementById('login-screen').style.display = 'none';
-                    alert("Selamat bekerja, " + namaKasirAktif + "!");
-                    checkKalkulatorData(); // <-- Jalankan pengecekan data gorden sesudah login sukses
+                    showMsg("Selamat bekerja, " + namaKasirAktif + "!");
+                    checkKalkulatorData();
                 }
             } else {
-                alert("Login Gagal: " + data.message);
+                showMsg("Login Gagal: " + data.message);
             }
         })
-        .catch(err => alert("Gagal terhubung ke server login: " + err.message));
+        .catch(err => showMsg("Gagal terhubung ke server login: " + err.message));
     }
 
     function prosesGantiPIN() {
         const p1 = document.getElementById('pin-baru-1').value.trim();
         const p2 = document.getElementById('pin-baru-2').value.trim();
 
-        if (!p1 || !p2) { alert("PIN baru tidak boleh kosong!"); return; }
-        if (p1 !== p2) { alert("Konfirmasi PIN baru tidak cocok!"); return; }
-        if (p1 === "1234" || p1.length < 4) { alert("Gunakan PIN yang lebih kuat!"); return; }
+        if (!p1 || !p2) { showMsg("PIN baru tidak boleh kosong!"); return; }
+        if (p1 !== p2) { showMsg("Konfirmasi PIN baru tidak cocok!"); return; }
+        if (p1 === "1234" || p1.length < 4) { showMsg("Gunakan PIN yang lebih kuat!"); return; }
 
         const idKasir = document.getElementById('login-id').value.trim();
         const params = new URLSearchParams();
@@ -431,14 +459,14 @@
         .then(res => res.json())
         .then(data => {
             if (data.status === "success") {
-                alert("PIN Berhasil diperbarui secara privat! Selamat bekerja.");
+                showMsg("PIN Berhasil diperbarui secara privat! Selamat bekerja.");
                 document.getElementById('login-screen').style.display = 'none';
-                checkKalkulatorData(); // <-- Jalankan pengecekan gorden disini juga jika baru ganti PIN
+                checkKalkulatorData();
             } else {
-                alert("Gagal memperbarui PIN: " + data.message);
+                showMsg("Gagal memperbarui PIN: " + data.message);
             }
         })
-        .catch(err => alert("Terjadi kesalahan sistem: " + err.message));
+        .catch(err => showMsg("Terjadi kesalahan sistem: " + err.message));
     }
 
     function addNewRow() {
@@ -510,11 +538,11 @@
         .then(response => { if (!response.ok) throw new Error('Jaringan Bermasalah'); return response.json(); })
         .then(res => {
             if (bukaCetakSetelahSelesai) { window.print(); } 
-            else { alert(res.result === "updated" ? "Data Nota " + nota + " Diperbarui!" : "Sukses Disimpan ke Sheets."); }
+            else { showMsg(res.result === "updated" ? "Data Nota " + nota + " Diperbarui!" : "Sukses Disimpan ke Sheets."); }
         })
         .catch(err => {
             if (bukaCetakSetelahSelesai) { if (confirm("Gagal sinkron ke Google Sheets. Tetap cetak?")) window.print(); } 
-            else { alert("Gagal simpan ke Sheets: " + err.message); }
+            else { showMsg("Gagal simpan ke Sheets: " + err.message); }
         });
     }
 
@@ -539,11 +567,11 @@
                     const data = JSON.parse(qrCodeMessage);
                     if (data.shop === "Yeny Gorden") {
                         html5QrcodeScanner.stop().then(() => { document.getElementById('scanner-area').style.display = 'none'; });
-                        if (data.sisa <= 0) { alert("Nota ini sudah LUNAS."); return; }
+                        if (data.sisa <= 0) { showMsg("Nota ini sudah LUNAS."); return; }
 
                         const sisaLama = parseFloat(data.sisa) || 0;
                         const inputBayar = prompt(`Sisa tagihan: Rp ${sisaLama.toLocaleString('id-ID')}\nMasukkan nominal bayar termin ini:`, sisaLama);
-                        if (!inputBayar || isNaN(inputBayar)) { alert("Batal."); return; }
+                        if (!inputBayar || isNaN(inputBayar)) { showMsg("Batal."); return; }
 
                         const nominalBayar = parseFloat(inputBayar);
                         document.getElementById('nota-num').value = data.nota;
@@ -581,21 +609,18 @@
                     }
                 } catch (e) {}
             }, () => {}
-        ).catch(err => { alert("Gagal akses kamera: " + err); });
+        ).catch(err => { showMsg("Gagal akses kamera: " + err); });
     }
 
-    // --- FUNGSI AMBIL DATA OTOMATIS DARI KALKULATOR GORDEN ---
     function checkKalkulatorData() {
         const dataKiriman = localStorage.getItem('gordenInvoiceData');
         if (dataKiriman) {
             const daftarGorden = JSON.parse(dataKiriman);
             const tableBody = document.getElementById('invoice-table').getElementsByTagName('tbody')[0];
             
-            // Hapus baris default agar bersih
             tableBody.innerHTML = "";
             let ringkasanSpek = "";
 
-            // Inject hasil kalkulator langsung menjadi baris di invoice
             daftarGorden.forEach((item, index) => {
                 const row = tableBody.insertRow();
                 row.innerHTML = `
@@ -608,13 +633,8 @@
                 ringkasanSpek += `${index + 1}. ${item.nama}: ${item.spesifikasi}\n`;
             });
 
-            // Set ke area spesifikasi proyek gorden
             document.getElementById('project-details').value = ringkasanSpek;
-            
-            // Hitung grand total, diskon, & sisa otomatis
             calculateTotal();
-
-            // Clear memori transfer agar bersih saat buat nota baru berikutnya
             localStorage.removeItem('gordenInvoiceData');
         }
     }
