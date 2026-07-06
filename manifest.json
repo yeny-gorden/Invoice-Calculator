@@ -11,5 +11,13 @@
       "sizes": "512x512",
       "type": "image/png"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "Scanner Nota",
+      "short_name": "Scanner",
+      "url": "./invoice.html",
+      "icons": [{ "src": "logo.png", "sizes": "512x512" }]
+    }
   ]
 }
