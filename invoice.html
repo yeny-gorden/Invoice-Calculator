@@ -5,362 +5,106 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice Resmi - Yeny Gorden</title>
     
-    <!-- Link PWA & Icon -->
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/png" href="./logo.png">
-    <link rel="apple-touch-icon" href="./logo.png">
     <meta name="theme-color" content="#9a3412">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
+    
     <style>
-        :root {
-            --primary: #0f172a;       
-            --accent: #9a3412;        
-            --success: #166534;       
-            --text-main: #1e293b;     
-            --bg-light: #f8fafc;
-            --border: #94a3b8;        
-        }
+        :root { --primary: #0f172a; --accent: #9a3412; --success: #166534; --border: #94a3b8; --bg-light: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; margin: 0; padding: 40px 20px; background-color: #cbd5e1; color: #1e293b; }
         
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            margin: 0;
-            padding: 40px 20px;
-            background-color: #cbd5e1;
-            color: var(--text-main);
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-        }
-
-        /* --- STYLE SYSTEM LOGIN --- */
-        #login-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #0f172a;
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .login-box {
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 360px;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
-            text-align: center;
-        }
-        .login-box h2 { margin: 0 0 10px 0; color: var(--primary); font-weight: 800; }
-        .login-box p { color: #64748b; font-size: 14px; margin: 0 0 25px 0; }
-        .login-box input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 2px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            box-sizing: border-box;
-            text-align: center;
-        }
-        .login-box input:focus { border-color: var(--accent); outline: none; }
-        .login-box button {
-            width: 100%;
-            padding: 12px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        /* --------------------------- */
-
-        .invoice-container {
-            max-width: 850px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 50px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            position: relative; 
-            overflow: hidden;
-        }
-
-        .stamp-lunas {
-            position: absolute;
-            top: 45%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-15deg);
-            border: 6px double #dc2626;
-            color: #dc2626;
-            font-size: 70px;
-            font-weight: 900;
-            padding: 10px 40px;
-            border-radius: 15px;
-            opacity: 0.18; 
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            pointer-events: none;
-            display: none; 
-            z-index: 99;
-        }
-
-        .invoice-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 3px solid var(--primary);
-            padding-bottom: 30px;
-            margin-bottom: 35px;
-        }
-
-        .brand-section h1 { margin: 0; font-size: 36px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
-        .brand-section p { margin: 6px 0 0 0; font-size: 14px; color: #334155; font-weight: 500; }
-        .nib-text { color: var(--accent) !important; font-weight: 700 !important; margin-top: 4px !important; }
-
-        .invoice-meta-title h2 { margin: 0 0 10px 0; font-size: 30px; font-weight: 800; color: var(--accent); letter-spacing: 1px; }
-        .meta-inputs { font-weight: 700; color: var(--primary); }
-        .meta-inputs div { margin-bottom: 5px; }
-        .meta-inputs input { border: 1px solid transparent; text-align: right; font-size: 15px; padding: 4px; width: 190px; font-weight: 700; color: var(--primary); background: transparent; }
-        .meta-inputs input:focus { border-color: var(--border); background: var(--bg-light); outline: none; }
-
-        .details-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; margin-bottom: 40px; }
-        .info-card { background: var(--bg-light); padding: 20px; border-radius: 8px; border: 2px solid var(--border); }
-        .info-card h3 { margin: 0 0 12px 0; font-size: 13px; text-transform: uppercase; color: var(--accent); font-weight: 800; letter-spacing: 0.5px; }
+        .invoice-container { max-width: 850px; margin: 0 auto; background: #ffffff; padding: 50px; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); position: relative; }
         
-        .info-card input, .info-card textarea { 
-            width: 100%; 
-            background: transparent; 
-            border: 1px solid transparent; 
-            padding: 6px 0; 
-            font-size: 15px; 
-            color: var(--primary); 
-            font-weight: 600;
-        }
-        .info-card input::placeholder, .info-card textarea::placeholder { color: #64748b; font-weight: 400; }
-        .info-card input:focus, .info-card textarea:focus { border-bottom: 2px solid var(--primary); outline: none; background: #fff; }
+        /* Header */
+        .invoice-header { display: flex; justify-content: space-between; border-bottom: 3px solid var(--primary); padding-bottom: 30px; margin-bottom: 35px; }
+        .brand-section h1 { margin: 0; font-size: 36px; font-weight: 800; color: var(--primary); }
+        .invoice-meta-title h2 { margin: 0; color: var(--accent); }
+        .meta-inputs input { border: 1px solid #ccc; padding: 4px; width: 150px; }
 
+        /* Form Table */
         table { width: 100%; border-collapse: collapse; margin-bottom: 25px; border: 2px solid var(--primary); }
-        th { background-color: var(--primary); color: #ffffff; padding: 14px 16px; font-size: 14px; font-weight: 700; text-transform: uppercase; }
-        td { padding: 14px 16px; border-bottom: 2px solid #e2e8f0; }
-        td input { width: 100%; border: 1px solid transparent; padding: 6px; font-size: 15px; font-weight: 600; color: var(--primary); background: transparent; }
-        td input:focus { background: var(--bg-light); border-color: var(--border); outline: none; }
-        .align-right input { text-align: right; font-weight: 700; }
+        th { background-color: var(--primary); color: #ffffff; padding: 10px; }
+        td { padding: 10px; border-bottom: 2px solid #e2e8f0; }
+        td input { width: 100%; border: none; }
 
-        .invoice-summary-section { display: flex; justify-content: flex-end; margin-top: 20px; }
-        .summary-box { width: 360px; border: 2px solid var(--border); padding: 15px; border-radius: 8px; background: var(--bg-light); }
-        .summary-row { display: flex; justify-content: space-between; padding: 10px 0; font-size: 15px; align-items: center; font-weight: 700; color: var(--primary); }
-        .summary-row input { text-align: right; border: 1px solid transparent; font-size: 15px; width: 150px; font-weight: 800; color: var(--primary); background: transparent; }
-        .summary-row input:focus { background: #fff; border-color: var(--border); outline: none; }
-        .grand-total-row { border-top: 3px solid var(--primary); margin-top: 8px; padding-top: 14px; font-size: 18px; font-weight: 800; }
-
-        .invoice-footer { margin-top: 60px; display: flex; justify-content: space-between; align-items: center; border-top: 2px dashed var(--border); padding-top: 30px; }
-        .terms { font-size: 13px; color: #1e293b; max-width: 420px; font-weight: 500; line-height: 1.5; }
-        .signature-qr-wrap { display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .signature-qr-wrap p { margin: 0 0 10px 0; font-size: 14px; font-weight: 700; color: var(--primary); }
-
-        #qrcode { padding: 8px; background: #fff; border: 2px solid var(--primary); border-radius: 6px; }
-
-        #scanner-area {
-            max-width: 850px;
-            margin: 0 auto 20px auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            border: 3px dashed var(--accent);
-            display: none;
-        }
-
-        .action-bar { max-width: 850px; margin: 25px auto 0 auto; display: flex; justify-content: space-between; gap: 10px; }
-        .btn { padding: 12px 24px; font-size: 15px; font-weight: 700; border-radius: 6px; cursor: pointer; border: none; transition: 0.2s; }
-        .btn-add { background-color: #e2e8f0; color: var(--primary); border: 2px solid var(--border); }
-        .btn-print { background-color: var(--accent); color: #fff; }
+        /* Pencarian Manual */
+        .manual-search-box { max-width: 850px; margin: 20px auto; background: #fff; padding: 15px; border-radius: 12px; border: 1px solid var(--border); display: flex; gap: 10px; }
+        
+        /* Action Bar */
+        .action-bar { max-width: 850px; margin: 0 auto; display: flex; justify-content: space-between; gap: 10px; }
+        .btn { padding: 12px 20px; font-weight: 700; border-radius: 6px; cursor: pointer; border: none; }
         .btn-scan { background-color: var(--primary); color: #fff; }
-        .btn-delete { background: transparent; color: #dc2626; font-size: 13px; font-weight: 700; }
-        .btn:hover { opacity: 0.9; }
-
-        #status-badge {
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: 800;
-            background-color: #fef3c7;
-            color: #b45309;
-            margin-top: 5px;
-            border: 1px solid #f59e0b;
-        }
-
-        #active-cashier-info {
-            font-size: 13px;
-            color: var(--primary);
-            font-weight: 700;
-            margin-top: 5px;
-            background: #e2e8f0;
-            padding: 4px 10px;
-            border-radius: 4px;
-            display: inline-block;
-        }
-
-        @media print {
-            body { background: #fff; padding: 0; }
-            .invoice-container { box-shadow: none; padding: 0; width: 100%; }
-            .action-bar, #scanner-area, .manual-search-box, .btn-delete, .th-action, .td-action, #login-screen { display: none !important; }
-            input, textarea { border: none !important; background: transparent !important; pointer-events: none; color: #000 !important; }
-            .info-card { border: 2px solid #000; }
-            table { border: 2px solid #000; }
-            th { background-color: #000 !important; color: #fff !important; }
-            td { border-bottom: 1px solid #000; }
-            .summary-box { border: 2px solid #000; }
-            .stamp-lunas { opacity: 0.25 !important; } 
-        }
+        .btn-print { background-color: var(--accent); color: #fff; }
+        .btn-add { background-color: #e2e8f0; color: var(--primary); }
     </style>
 </head>
 <body>
 
-<!-- SCREEN LOGIN -->
-<div id="login-screen">
-    <div class="login-box" id="box-auth">
-        <h2>KASIR LOGIN</h2>
-        <p>Yeny Gorden Billing System</p>
-        <input type="text" id="login-id" placeholder="ID / Nama Kasir">
-        <input type="password" id="login-pin" placeholder="Masukkan PIN" pattern="[0-9]*" inputmode="numeric">
-        <button onclick="prosesLogin()">Masuk Aplikasi</button>
-    </div>
-</div>
-
-<!-- AREA SCANNER & SEARCH -->
-<div id="scanner-area">
-    <h3 style="margin-top: 0; color: var(--accent); font-weight: 800;">Kamera Scanner Yeny Gorden</h3>
-    <div id="reader" style="width: 100%; max-width: 400px; margin: 0 auto;"></div>
-    <button class="btn btn-delete" style="display: block; margin: 10px auto 0 auto;" onclick="toggleScanner()">Tutup Kamera</button>
-</div>
-
-<!-- INPUT MANUAL -->
-<div class="manual-search-box" style="max-width: 850px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 12px; border: 1px solid var(--border);">
-    <h4 style="margin: 0 0 10px 0; color: var(--primary);">Pencarian Manual Nota:</h4>
-    <div style="display: flex; gap: 10px;">
-        <input type="text" id="manual-nota-input" placeholder="Masukkan nomor nota..." style="flex:1; padding: 10px; border: 1px solid var(--border); border-radius: 6px;">
-        <button class="btn btn-scan" onclick="cariNotaManual()">Cari Nota</button>
-    </div>
-</div>
-
 <div class="invoice-container">
-    <div id="stamp" class="stamp-lunas">LUNAS</div>
-
     <div class="invoice-header">
         <div class="brand-section">
             <h1>Yeny Gorden</h1>
-            <p>Jl. Jendral Sudirman Rt.5 Rw.1 Berkoh - Purpurwokerto</p>
-            <p class="nib-text">NIB: 3006260016473</p>
+            <p>Jl. Jendral Sudirman, Purwokerto</p>
         </div>
-        <div class="invoice-title-block">
-            <div class="invoice-meta-title">
-                <h2>INVOICE</h2>
-                <div class="meta-inputs">
-                    <div>No Nota: <input type="text" id="nota-num" value="" oninput="updateQRCode()"></div>
-                    <div>Tanggal: <input type="date" id="date-picker"></div>
-                </div>
-                <div id="status-badge">STATUS: BELUM LUNAS (DP)</div>
+        <div class="invoice-meta-title">
+            <h2>INVOICE</h2>
+            <div class="meta-inputs">
+                No Nota: <input type="text" id="nota-num" placeholder="No Nota">
             </div>
-        </div>
-    </div>
-
-    <!-- Konten Invoice lainnya tetap sama -->
-    <div class="details-grid">
-        <div class="info-card">
-            <h3>Diterbitkan Kepada:</h3>
-            <input type="text" id="client-name" placeholder="Nama Pelanggan" style="font-weight: 700; font-size: 16px;" oninput="updateQRCode()">
-            <textarea id="client-address" rows="2" placeholder="Alamat lengkap pemasangan"></textarea>
-            <input type="text" id="client-phone" placeholder="No. HP / WhatsApp">
-        </div>
-        <div class="info-card">
-            <h3>Detail & Spesifikasi Proyek:</h3>
-            <textarea id="project-details" rows="4" placeholder="Catatan Model Gorden & Kain"></textarea>
         </div>
     </div>
 
     <table id="invoice-table">
         <thead>
             <tr>
-                <th style="width: 45%; text-align: left;">Deskripsi Pesanan</th>
-                <th style="width: 10%; text-align: right;">Jumlah</th>
-                <th style="width: 20%; text-align: right;">Harga Satuan (Rp)</th>
-                <th style="width: 20%; text-align: right;">Total (Rp)</th>
-                <th class="th-action" style="width: 5%;"></th>
+                <th>Deskripsi</th>
+                <th>Jumlah</th>
+                <th>Harga</th>
+                <th>Total</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td><input type="text" id="item-desc" placeholder="Deskripsi Gorden"></td>
-                <td class="align-right"><input type="number" class="qty" placeholder="0" min="0" oninput="calculateTotal()"></td>
-                <td class="align-right"><input type="number" class="price" placeholder="0" min="0" oninput="calculateTotal()"></td>
-                <td class="align-right"><input type="number" class="row-total" placeholder="0" readonly></td>
-                <td class="td-action"><button class="btn btn-delete" onclick="removeRow(this)">Hapus</button></td>
+                <td><input type="text" placeholder="Nama Barang"></td>
+                <td><input type="number" class="qty" value="0"></td>
+                <td><input type="number" class="price" value="0"></td>
+                <td><input type="number" class="row-total" value="0" readonly></td>
             </tr>
         </tbody>
     </table>
-
-    <div class="invoice-summary-section">
-        <div class="summary-box">
-            <div class="summary-row">
-                <span>Subtotal</span>
-                <div>Rp <input type="number" id="subtotal" value="0" readonly></div>
-            </div>
-            <div class="summary-row" style="color: #dc2626;">
-                <span>Diskon (Rp)</span>
-                <div>Rp <input type="number" id="discount-amount" placeholder="0" min="0" oninput="calculateTotal()"></div>
-            </div>
-            <div class="summary-row" style="color: var(--success);" id="dp-row-label">
-                <span>Uang Muka (DP)</span>
-                <div>Rp <input type="number" id="dp-amount" placeholder="0" min="0" oninput="calculateTotal()"></div>
-            </div>
-            <div class="summary-row grand-total-row" id="sisa-row-label">
-                <span>Sisa Pembayaran</span>
-                <div style="color: var(--accent);">Rp <input type="number" id="balance-due" value="0" readonly style="color: var(--accent); font-size: 18px;"></div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="invoice-footer">
-        <div class="terms">
-            <p style="margin: 0 0 5px 0; font-weight: 700; color: var(--primary);">Syarat & Ketentuan:</p>
-            <p style="margin: 0;">1. Dp minimal 50% dari total tagihan.<br>2. Produk gorden dikerjakan setelah DP dikonfirmasi.</p>
-        </div>
-        <div class="signature-qr-wrap">
-            <div id="qrcode"></div>
-        </div>
-    </div>
 </div>
 
+<!-- TOMBOL PENCARIAN MANUAL -->
+<div class="manual-search-box">
+    <input type="text" id="manual-nota-input" placeholder="Masukkan nomor nota untuk mencari..." style="flex:1; padding: 8px;">
+    <button class="btn btn-scan" onclick="cariNotaManual()">Cari Nota</button>
+</div>
+
+<!-- TOMBOL AKSI -->
 <div class="action-bar">
     <div>
         <button class="btn btn-scan" onclick="toggleScanner()">Mode Kasir: Scan QR</button>
         <button class="btn btn-add" onclick="addNewRow()">+ Tambah Baris</button>
     </div>
-    <div>
-        <button class="btn btn-print" onclick="simpanLaluCetak()">Cetak / Simpan PDF</button>
-    </div>
+    <button class="btn btn-print" onclick="window.print()">Cetak / Simpan PDF</button>
 </div>
 
 <script>
-    // FUNGSI PENCARIAN MANUAL
+    // Fungsi Pencarian Manual
     function cariNotaManual() {
         const nota = document.getElementById('manual-nota-input').value.trim();
         if (!nota) { alert("Masukkan nomor nota!"); return; }
         
-        // Asumsi data diambil via API, sesuaikan dengan logika backend Anda
-        fetch(`${WEB_APP_URL}?action=getNota&nota=${nota}`)
+        // Sesuaikan URL_WEB_APP dengan URL Google Script Anda
+        fetch(`${URL_WEB_APP}?action=getNota&nota=${nota}`)
         .then(res => res.json())
         .then(data => {
             if (data.status === "success") {
-                isiDataKeForm(data.data);
                 alert("Nota ditemukan!");
+                // Panggil fungsi pengisian form Anda di sini
+                // isiDataKeForm(data.data);
             } else {
                 alert("Nota tidak ditemukan.");
             }
@@ -368,12 +112,14 @@
         .catch(err => alert("Gagal mengambil data."));
     }
 
+    // Enter Key Listener
     document.getElementById('manual-nota-input').addEventListener("keyup", (e) => {
         if (e.key === "Enter") cariNotaManual();
     });
 
-    // Sisa script lainnya tetap sama seperti milik Anda...
-    // (Fungsi prosesLogin, calculateTotal, dll tetap di bawah ini)
+    function addNewRow() { /* Kode tambah baris Anda */ }
+    function toggleScanner() { /* Kode buka scanner Anda */ }
 </script>
+
 </body>
 </html>
