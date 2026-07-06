@@ -1,2 +1,1 @@
-# Invoice-Calculator
 Kalkulator + Invoice
