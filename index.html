@@ -60,6 +60,7 @@
         </div>
 
         <div class="grid">
+            <!-- Form Input -->
             <div class="col-form bg-slate-800">
                 <h2 class="text-white font-bold mb-4" style="font-size: 1.125rem;"><i class="fa-solid fa-sliders text-indigo-400"></i> Input Dimensi Jendela</h2>
                 <div class="flex gap-4 mb-4" style="gap: 1rem;">
@@ -103,6 +104,7 @@
                     <input type="number" id="hargaKainManual">
                 </div>
 
+                <!-- Vitrase Toggle -->
                 <div class="mb-4" style="border-top: 1px solid #334155; padding-top: 1rem;">
                     <div class="flex items-center justify-between p-3 rounded-xl" style="background: rgba(15, 23, 42, 0.6);">
                         <span class="text-sm font-bold text-white">Tambahkan Vitrase?</span>
@@ -132,10 +134,12 @@
                 <button type="button" onclick="hitungGorden()" class="btn-hitung"><i class="fa-solid fa-plus"></i> Hitung & Tambahkan Item</button>
             </div>
 
+            <!-- List Antrean -->
             <div class="col-list flex" style="flex-direction: column; justify-content: space-between;">
                 <div id="welcomeState" class="border-dashed p-4 text-center flex" style="flex-direction:column; justify-content:center; align-items:center; min-h-[300px]; border-radius:1rem; height:100%;">
                     <i class="fa-solid fa-receipt text-slate-500" style="font-size: 2.5rem; margin-bottom:1rem;"></i>
                     <h3 style="color:#94a3b8; font-weight:700;">Belum Ada Hitungan</h3>
+                    <button type="button" onclick="window.location.href='invoice.html'" style="background:transparent; border:1px solid #334155; color:#64748b; margin-top:1rem; padding:0.5rem 1rem; border-radius:0.75rem; cursor:pointer;">Lewati ke Invoice</button>
                 </div>
 
                 <div id="resultState" class="bg-slate-800 hidden" style="height:100%; display:flex; flex-direction:column; justify-content:space-between; border-radius:1rem;">
@@ -150,6 +154,7 @@
                         <div style="color:#94a3b8; font-size:12px; font-weight:600;">Total Akumulasi Gorden:</div>
                         <div id="grandTotal" class="text-indigo-400 font-bold" style="font-size:1.75rem; margin-bottom:1rem;">Rp 0</div>
                         <button type="button" onclick="bukaFormInvoice()" class="btn-proses"><i class="fa-solid fa-file-invoice"></i> Buat Invoice Sekarang</button>
+                        <button type="button" onclick="window.location.href='invoice.html'" style="background:transparent; border:1px solid #334155; color:#64748b; width:100%; padding:0.5rem; border-radius:0.75rem; margin-top:0.5rem; cursor:pointer; font-size:12px;">Lewati ke Invoice</button>
                     </div>
                 </div>
             </div>
@@ -192,13 +197,12 @@
             let hargaKainInput = parseFloat(document.getElementById('hargaKainManual').value);
             let hargaVitraseInput = parseFloat(document.getElementById('hargaVitraseManual').value) || 0;
 
-            if (!lebar || !tinggi || isNaN(hargaKainInput)) { alert("Mohon isi ukuran Lebar, Tinggi dan Harga."); return; }
+            if (!lebar || !tinggi || isNaN(hargaKainInput)) { alert("Mohon isi ukuran Lebar, Tinggi dan Harga Kain."); return; }
 
             let totalSatuJendela = 0;
 
             if (modelGorden === 'blind') {
-                // Rumus Blind: L (minimal 1m) * T (minimal 1m) * Harga
-                totalSatuJendela = Math.max(1, lebar) * Math.max(1, tinggi) * hargaKainInput;
+                totalSatuJendela = (Math.max(1, lebar) * Math.max(1, tinggi) * hargaKainInput) + (Math.max(1, Math.ceil(lebar)) * HARGA.instalasi);
             } else {
                 let meterKainUtama = (jenisKain === 'import') ? (lebar + 0.2) * 3 : Math.ceil((lebar + 0.2) / 0.4) * (tinggi + 0.3);
                 if (modelGorden === 'tabtop') meterKainUtama += 1;
@@ -223,14 +227,12 @@
                         totalSatuJendela += (meterVitrase * hargaVitraseInput) + (meterVitrase * HARGA.jahit) + (Math.max(1, Math.ceil(lebar)) * HARGA.rell);
                     }
                 }
+                totalSatuJendela += Math.max(1, Math.ceil(lebar)) * HARGA.instalasi;
             }
-            
-            // Tambahkan Biaya Instalasi (berlaku untuk semua)
-            totalSatuJendela += Math.max(1, Math.ceil(lebar)) * HARGA.instalasi;
 
             daftarJendela.push({
-                nama: `Gorden/Blind ${modelGorden.toUpperCase()} (Jndl ${daftarJendela.length + 1})`,
-                spesifikasi: `L:${lebar.toFixed(2)}m x T:${tinggi.toFixed(2)}m`,
+                nama: `Gorden ${modelGorden.toUpperCase()} (Jndl ${daftarJendela.length + 1})`,
+                spesifikasi: `L:${lebar.toFixed(2)}m x T:${tinggi.toFixed(2)}m Bahan:${jenisKain.toUpperCase()}`,
                 harga: totalSatuJendela
             });
 
