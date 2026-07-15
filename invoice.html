@@ -34,19 +34,51 @@
             print-color-adjust: exact;
         }
 
-        /* --- TAMBAHAN: STYLE CUSTOM ALERT --- */
+        /* --- STYLE CUSTOM ALERT MODAL --- */
         #custom-alert-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
         }
-        .custom-alert-box {
-            background: #fff; padding: 25px; border-radius: 12px; width: 90%; max-width: 300px;
-            text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        .alert-box {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
+            text-align: center;
+            border-top: 6px solid var(--accent);
+            animation: slideIn 0.25s ease-out;
         }
-        .custom-alert-box button {
-            margin-top: 20px; width: 100%; padding: 10px; background: var(--accent);
-            color: white; border: none; border-radius: 6px; font-weight: 700; cursor: pointer;
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
+        .alert-box h3 { margin: 0 0 12px 0; color: var(--primary); font-weight: 800; font-size: 18px; }
+        .alert-box p { color: #475569; font-size: 15px; margin: 0 0 25px 0; font-weight: 500; line-height: 1.5; }
+        .alert-buttons { display: flex; justify-content: center; gap: 10px; }
+        .alert-btn-ok { background: var(--accent); color: white; border: none; padding: 10px 24px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; }
+        .alert-btn-cancel { background: #e2e8f0; color: var(--primary); border: none; padding: 10px 24px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; }
+        
+        #alert-prompt-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 15px;
+            text-align: center;
+            font-weight: 600;
+            box-sizing: border-box;
+            display: none;
+        }
+        #alert-prompt-input:focus { border-color: var(--accent); outline: none; }
 
         /* --- STYLE SYSTEM LOGIN --- */
         #login-screen {
@@ -92,7 +124,6 @@
             font-weight: 700;
             cursor: pointer;
         }
-        /* --------------------------- */
 
         .invoice-container {
             max-width: 850px;
@@ -133,9 +164,9 @@
             margin-bottom: 35px;
         }
 
-        .brand-section h1 { margin: 0; font-size: 36px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
-        .brand-section p { margin: 6px 0 0 0; font-size: 14px; color: #334155; font-weight: 500; }
-        .nib-text { color: var(--accent) !important; font-weight: 700 !important; margin-top: 4px !important; }
+        .brand-section h1 { margin: 0; font-size: 36px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; text-transform: uppercase; }
+        .brand-section p { margin: 4px 0 0 0; font-size: 14px; color: #334155; font-weight: 500; }
+        .nib-text { color: var(--accent) !important; font-weight: 700 !important; }
 
         .invoice-meta-title h2 { margin: 0 0 10px 0; font-size: 30px; font-weight: 800; color: var(--accent); letter-spacing: 1px; }
         .meta-inputs { font-weight: 700; color: var(--primary); }
@@ -159,26 +190,39 @@
         .info-card input::placeholder, .info-card textarea::placeholder { color: #64748b; font-weight: 400; }
         .info-card input:focus, .info-card textarea:focus { border-bottom: 2px solid var(--primary); outline: none; background: #fff; }
 
-        table { width: 100%; border-collapse: collapse; margin-bottom: 25px; border: 2px solid var(--primary); }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; border: 2px solid var(--primary); }
         th { background-color: var(--primary); color: #ffffff; padding: 14px 16px; font-size: 14px; font-weight: 700; text-transform: uppercase; }
         td { padding: 14px 16px; border-bottom: 2px solid #e2e8f0; }
         td input { width: 100%; border: 1px solid transparent; padding: 6px; font-size: 15px; font-weight: 600; color: var(--primary); background: transparent; }
         td input:focus { background: var(--bg-light); border-color: var(--border); outline: none; }
         .align-right input { text-align: right; font-weight: 700; }
 
+        .table-actions-row { display: flex; justify-content: flex-start; margin-bottom: 25px; }
+
         .invoice-summary-section { display: flex; justify-content: flex-end; margin-top: 20px; }
         .summary-box { width: 360px; border: 2px solid var(--border); padding: 15px; border-radius: 8px; background: var(--bg-light); }
-        .summary-row { display: flex; justify-content: space-between; padding: 10px 0; font-size: 15px; align-items: center; font-weight: 700; color: var(--primary); }
+        .summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 15px; align-items: center; font-weight: 700; color: var(--primary); }
         .summary-row input { text-align: right; border: 1px solid transparent; font-size: 15px; width: 150px; font-weight: 800; color: var(--primary); background: transparent; }
         .summary-row input:focus { background: #fff; border-color: var(--border); outline: none; }
         .grand-total-row { border-top: 3px solid var(--primary); margin-top: 8px; padding-top: 14px; font-size: 18px; font-weight: 800; }
 
-        .invoice-footer { margin-top: 60px; display: flex; justify-content: space-between; align-items: center; border-top: 2px dashed var(--border); padding-top: 30px; }
+        .invoice-footer { margin-top: 60px; display: flex; justify-content: space-between; align-items: center; border-top: 2px dashed var(--border); padding-top: 30px; position: relative; }
         .terms { font-size: 13px; color: #1e293b; max-width: 420px; font-weight: 500; line-height: 1.5; }
         .signature-qr-wrap { display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .signature-qr-wrap p { margin: 0 0 10px 0; font-size: 14px; font-weight: 700; color: var(--primary); }
 
-        #qrcode { padding: 8px; background: #fff; border: 2px solid var(--primary); border-radius: 6px; }
+        #qrcode { display: block; width: 150px; height: 150px; }
+
+        .thanks-note {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+            font-style: italic;
+            margin-top: 40px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 15px;
+            letter-spacing: 0.3px;
+        }
 
         #scanner-area {
             max-width: 850px;
@@ -190,9 +234,11 @@
             display: none;
         }
 
-        .action-bar { max-width: 850px; margin: 25px auto 0 auto; display: flex; justify-content: space-between; gap: 10px; }
-        .btn { padding: 12px 24px; font-size: 15px; font-weight: 700; border-radius: 6px; cursor: pointer; border: none; transition: 0.2s; }
-        .btn-add { background-color: #e2e8f0; color: var(--primary); border: 2px solid var(--border); }
+        .action-bar { max-width: 850px; margin: 25px auto 0 auto; display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+        .action-left { display: flex; gap: 5px; align-items: center; }
+        .action-right { display: flex; gap: 10px; align-items: center; }
+        .btn { padding: 12px 24px; font-size: 15px; font-weight: 700; border-radius: 6px; cursor: pointer; border: none; transition: 0.2s; white-space: nowrap; }
+        .btn-add { background-color: #e2e8f0; color: var(--primary); border: 2px solid var(--border); padding: 8px 16px; font-size: 14px; }
         .btn-print { background-color: var(--accent); color: #fff; }
         .btn-scan { background-color: var(--primary); color: #fff; }
         .btn-delete { background: transparent; color: #dc2626; font-size: 13px; font-weight: 700; }
@@ -224,7 +270,7 @@
         @media print {
             body { background: #fff; padding: 0; }
             .invoice-container { box-shadow: none; padding: 0; width: 100%; }
-            .action-bar, #scanner-area, .btn-delete, .th-action, .td-action, #login-screen { display: none !important; }
+            .action-bar, #scanner-area, .btn-delete, .th-action, .td-action, #login-screen, .table-actions-row, #custom-alert-overlay { display: none !important; }
             input, textarea { border: none !important; background: transparent !important; pointer-events: none; color: #000 !important; }
             .info-card { border: 2px solid #000; }
             table { border: 2px solid #000; }
@@ -232,20 +278,28 @@
             td { border-bottom: 1px solid #000; }
             .summary-box { border: 2px solid #000; }
             .stamp-lunas { opacity: 0.25 !important; } 
+            #qrcode-container {
+                border: 2px solid #000000 !important;
+                background: #ffffff !important;
+            }
+            #qrcode img { display: block !important; }
         }
     </style>
 </head>
 <body>
 
-<!-- TAMBAHAN: MODAL CUSTOM ALERT -->
 <div id="custom-alert-overlay">
-    <div class="custom-alert-box">
-        <div id="custom-alert-msg" style="font-weight: 600;"></div>
-        <button onclick="document.getElementById('custom-alert-overlay').style.display='none'">Oke</button>
+    <div class="alert-box">
+        <h3 id="alert-title">Notifikasi</h3>
+        <p id="alert-message">Pesan teks di sini...</p>
+        <input type="text" id="alert-prompt-input">
+        <div class="alert-buttons">
+            <button id="alert-btn-cancel" class="alert-btn-cancel" onclick="closeCustomAlert(false)">Batal</button>
+            <button id="alert-btn-ok" class="alert-btn-ok" onclick="closeCustomAlert(true)">Oke</button>
+        </div>
     </div>
 </div>
 
-<!-- SCREEN LOGIN (OVERLAY) -->
 <div id="login-screen">
     <div class="login-box" id="box-auth">
         <h2>KASIR LOGIN</h2>
@@ -266,7 +320,7 @@
 
 <div id="scanner-area">
     <h3 style="margin-top: 0; color: var(--accent); font-weight: 800;">Kamera Scanner Yeny Gorden</h3>
-    <p style="font-size: 14px; color: #334155; font-weight: 500;">Arahkan kamera ke QR Code nota DP milik pelanggan untuk melakukan pelunasan otomatis.</p>
+    <p style="font-size: 14px; color: #334155; font-weight: 500;">Arahkan kamera ke QR Code nota pelanggan untuk pelunasan termin.</p>
     <div id="reader" style="width: 100%; max-width: 400px; margin: 0 auto;"></div>
     <button class="btn btn-delete" style="display: block; margin: 10px auto 0 auto;" onclick="toggleScanner()">Tutup Kamera</button>
 </div>
@@ -276,10 +330,11 @@
 
     <div class="invoice-header">
         <div class="brand-section">
-            <h1>Yeny Gorden</h1>
-            <p>Jl. Jendral Sudirman Rt.5 Rw.1 Berkoh - Purwokerto</p>
+            <h1>YENY GORDEN</h1>
+            <p style="font-style: italic; font-weight: 600; color: var(--accent); margin-bottom: 6px;">custom blinds & curtain</p>
+            <p>JL. Jend. Sudirman Berkoh - Purwokerto 53146</p>
+            <p>Tlp. 089504215020 | Email: yenygorden@gmail.com</p>
             <p class="nib-text">NIB: 3006260016473</p>
-            <p style="color: var(--accent); font-weight: 700; margin-top: 4px;">WhatsApp: +62 895-0421-5020</p>
         </div>
         <div class="invoice-title-block">
             <div class="invoice-meta-title">
@@ -288,7 +343,7 @@
                     <div>No Nota: <input type="text" id="nota-num" value="" oninput="updateQRCode()"></div>
                     <div>Tanggal: <input type="date" id="date-picker"></div>
                 </div>
-                <div id="status-badge">STATUS: BELUM LUNAS (DP)</div>
+                <div id="status-badge">STATUS: BARU (DRAFT)</div>
                 <br>
                 <div id="active-cashier-info">Kasir: <span id="txt-nama-kasir">-</span></div>
             </div>
@@ -298,7 +353,7 @@
     <div class="details-grid">
         <div class="info-card">
             <h3>Diterbitkan Kepada:</h3>
-            <input type="text" id="client-name" placeholder="Nama Pelanggan" style="font-weight: 700; font-size: 16px;" oninput="updateQRCode()">
+            <input type="text" id="client-name" placeholder="Nama Pelanggan" style="font-weight: 700; font-size: 16px;">
             <textarea id="client-address" rows="2" placeholder="Alamat lengkap pemasangan"></textarea>
             <input type="text" id="client-phone" placeholder="No. HP / WhatsApp">
         </div>
@@ -319,15 +374,13 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td><input type="text" id="item-desc" placeholder="Deskripsi Gorden"></td>
-                <td class="align-right"><input type="number" class="qty" placeholder="0" min="0" oninput="calculateTotal()"></td>
-                <td class="align-right"><input type="number" class="price" placeholder="0" min="0" oninput="calculateTotal()"></td>
-                <td class="align-right"><input type="number" class="row-total" placeholder="0" readonly></td>
-                <td class="td-action"><button class="btn btn-delete" onclick="removeRow(this)">Hapus</button></td>
-            </tr>
+            <!-- Data item gorden masuk disini -->
         </tbody>
     </table>
+
+    <div class="table-actions-row">
+        <button class="btn btn-add" onclick="addNewRow()">+ Tambah Baris</button>
+    </div>
 
     <div class="invoice-summary-section">
         <div class="summary-box">
@@ -336,15 +389,23 @@
                 <div>Rp <input type="number" id="subtotal" value="0" readonly></div>
             </div>
             <div class="summary-row" style="color: #dc2626;">
-                <span>Diskon (Rp)</span>
-                <div>Rp <input type="number" id="discount-amount" placeholder="0" min="0" oninput="calculateTotal()"></div>
+                <span>Diskon <span id="discount-label"></span></span>
+                <div>Rp <input type="number" id="discount-amount" placeholder="0" oninput="calculateTotal()"></div>
             </div>
-            <div class="summary-row" style="color: var(--success);" id="dp-row-label">
-                <span>Uang Muka (DP)</span>
+            <div class="summary-row">
+                <span>PPN (%)</span>
+                <div><input type="number" id="ppn-rate" value="0" min="0" oninput="calculateTotal()" style="width: 60px;"> %</div>
+            </div>
+            <div class="summary-row">
+                <span>Ongkos Kirim</span>
+                <div>Rp <input type="number" id="shipping-cost" value="0" min="0" oninput="calculateTotal()"></div>
+            </div>
+            <div class="summary-row" style="color: var(--success);">
+                <span>Total Masuk (DP/Cicilan)</span>
                 <div>Rp <input type="number" id="dp-amount" placeholder="0" min="0" oninput="calculateTotal()"></div>
             </div>
-            <div class="summary-row grand-total-row" id="sisa-row-label">
-                <span>Sisa Pembayaran</span>
+            <div class="summary-row grand-total-row">
+                <span>Sisa Tagihan</span>
                 <div style="color: var(--accent);">Rp <input type="number" id="balance-due" value="0" readonly style="color: var(--accent); font-size: 18px;"></div>
             </div>
         </div>
@@ -354,47 +415,78 @@
         <div class="terms">
             <p style="margin: 0 0 5px 0; font-weight: 700; color: var(--primary);">Syarat & Ketentuan:</p>
             <p style="margin: 0;">1. Dp minimal 50% dari total tagihan.<br>2. Produk gorden dikerjakan setelah DP dikonfirmasi.<br>
-            3. Permintaan pembatalan tidak di layani ketika sudah masuk proses pengerjaan..</p>
+            3. Permintaan pembatalan tidak di layani ketika sudah masuk proses pengerjaan.</p>
         </div>
         
-        <div class="signature-qr-wrap">
-            <p id="qr-title">Validasi & Ttd Digital</p>
-            <div id="qrcode"></div>
-            <p style="margin-top: 8px; font-size: 12px; font-weight: 700; color: #334155;">Yeny Gorden</p>
+        <div class="signature-qr-wrap" style="page-break-inside: avoid;">
+            <div id="qrcode-container" style="position: relative; display: inline-flex; align-items: center; justify-content: center; background: #ffffff; padding: 6px; border-radius: 8px; border: 2px solid #0f172a; width: 150px; height: 150px; box-sizing: content-box;">
+                <div id="qrcode"></div>
+                <img src="https://raw.githubusercontent.com/yeny-gorden/Invoice-Calculator/base/logo.png" style="position: absolute; width: 38px; height: 38px; border: 3px solid #ffffff; background: #ffffff; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.15); top: 50%; left: 50%; transform: translate(-50%, -50%);">
+            </div>
+            <p style="margin-top: 10px; font-size: 13px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">Yeny Gorden</p>
         </div>
+    </div>
+    
+    <div class="thanks-note">
+        "Terima Kasih Telah Mempercayakan Keindahan Hunian Anda Kepada Kami"
     </div>
 </div>
 
 <div class="action-bar">
-    <div>
-        <button class="btn btn-scan" onclick="toggleScanner()">Mode Kasir: Scan QR Pelunasan</button>
-        <button class="btn btn-add" onclick="addNewRow()">+ Tambah Baris</button>
+    <div class="action-left">
+        <input type="text" id="search-nota" placeholder="No. Nota..." style="padding: 10px; border-radius: 4px; border: 1px solid #94a3b8; font-size: 14px;">
+        <button class="btn btn-scan" style="padding: 10px 20px;" onclick="cariNotaManual()">Cari</button>
     </div>
-    <div>
+    <div class="action-right">
+        <button class="btn btn-scan" onclick="toggleScanner()">Mode Kasir: Scan QR</button>
         <button class="btn btn-print" onclick="simpanLaluCetak()">Cetak / Simpan PDF</button>
     </div>
 </div>
 
 <script>
-    // FUNGSI CUSTOM ALERT
-    function showMsg(pesan) {
-        document.getElementById('custom-alert-msg').innerText = pesan;
-        document.getElementById('custom-alert-overlay').style.display = 'flex';
-    }
-
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Service Worker terdaftar successfully!', reg.scope))
-            .catch(err => console.log('Pendaftaran Service Worker Gagal:', err));
-        });
-    }
-
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyiA6M_LsqfI_3Mu4Xd8M24MjUeFTuUmMF3AmXoWbdyo-iKUYmYaceECd9ivhBRVoA/exec";
+    // MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbySJJFsyBrryW_FRmzuM0hsQx1kkAzzBfUiSebEPXCjytKp70l3LD3QRh__CqkIg-8/exec";
 
     let namaKasirAktif = "";
     let isLunas = false;
     let html5QrcodeScanner;
+    let currentAlertCallback = null;
+
+    function showCustomAlert(title, message, type = "alert", defaultValue = "", callback = null) {
+        document.getElementById('alert-title').innerText = title;
+        document.getElementById('alert-message').innerText = message;
+        currentAlertCallback = callback;
+
+        const promptInput = document.getElementById('alert-prompt-input');
+        const cancelBtn = document.getElementById('alert-btn-cancel');
+
+        if (type === "prompt") {
+            promptInput.style.display = "block";
+            promptInput.value = defaultValue;
+            cancelBtn.style.display = "block";
+        } else if (type === "confirm") {
+            promptInput.style.display = "none";
+            cancelBtn.style.display = "block";
+        } else {
+            promptInput.style.display = "none";
+            cancelBtn.style.display = "none";
+        }
+
+        document.getElementById('custom-alert-overlay').style.display = "flex";
+        if (type === "prompt") promptInput.focus();
+    }
+
+    function closeCustomAlert(isOk) {
+        document.getElementById('custom-alert-overlay').style.display = "none";
+        const promptValue = document.getElementById('alert-prompt-input').value;
+        if (currentAlertCallback) {
+            if (document.getElementById('alert-prompt-input').style.display === "block") {
+                currentAlertCallback(isOk ? promptValue : null);
+            } else {
+                currentAlertCallback(isOk);
+            }
+        }
+    }
 
     function generateNotaNumber() {
         const now = new Date();
@@ -405,14 +497,43 @@
     document.getElementById('nota-num').value = generateNotaNumber();
 
     var qrcode = new QRCode(document.getElementById("qrcode"), {
-        width: 110, height: 110, colorDark : "#0f172a", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M
+        width: 150,
+        height: 150,
+        colorDark : "#0f172a",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
     });
+
+    window.onload = function() {
+        const dataKalkulator = localStorage.getItem('invoiceItems');
+        const tableBody = document.getElementById('invoice-table').getElementsByTagName('tbody')[0];
+        
+        if (dataKalkulator) {
+            const items = JSON.parse(dataKalkulator);
+            tableBody.innerHTML = "";
+            items.forEach(item => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td><input type="text" value="${item.namaItem}" placeholder="Deskripsi Pesanan"></td>
+                    <td class="align-right"><input type="number" class="qty" value="1" min="0" oninput="calculateTotal()"></td>
+                    <td class="align-right"><input type="number" class="price" value="${item.totalHarga}" min="0" oninput="calculateTotal()"></td>
+                    <td class="align-right"><input type="number" class="row-total" value="${item.totalHarga}" readonly></td>
+                    <td class="td-action"><button class="btn btn-delete" onclick="removeRow(this)">Hapus</button></td>
+                `;
+            });
+            localStorage.removeItem('invoiceItems');
+        } else {
+            tableBody.innerHTML = "";
+            addNewRow();
+        }
+        calculateTotal();
+    };
 
     function prosesLogin() {
         const idKasir = document.getElementById('login-id').value.trim();
         const pinKasir = document.getElementById('login-pin').value.trim();
 
-        if (!idKasir || !pinKasir) { showMsg("ID Kasir dan PIN tidak boleh kosong!"); return; }
+        if (!idKasir || !pinKasir) { showCustomAlert("Peringatan", "ID Kasir dan PIN tidak boleh kosong!"); return; }
 
         const params = new URLSearchParams();
         params.append('action', 'login');
@@ -431,25 +552,23 @@
                     document.getElementById('box-ganti-pin').style.display = 'block';
                 } else {
                     document.getElementById('login-screen').style.display = 'none';
-                    showMsg("Selamat bekerja, " + namaKasirAktif + "!");
-                    checkKalkulatorData();
+                    showCustomAlert("Login Sukses", "Selamat bekerja, " + namaKasirAktif + "!");
                 }
             } else {
-                showMsg("Login Gagal: " + data.message);
+                showCustomAlert("Gagal", data.message);
             }
         })
-        .catch(err => showMsg("Gagal terhubung ke server login: " + err.message));
+        .catch(err => showCustomAlert("Error", "Gagal terhubung ke server login. Pastikan URL Web App benar."));
     }
 
     function prosesGantiPIN() {
         const p1 = document.getElementById('pin-baru-1').value.trim();
         const p2 = document.getElementById('pin-baru-2').value.trim();
-
-        if (!p1 || !p2) { showMsg("PIN baru tidak boleh kosong!"); return; }
-        if (p1 !== p2) { showMsg("Konfirmasi PIN baru tidak cocok!"); return; }
-        if (p1 === "1234" || p1.length < 4) { showMsg("Gunakan PIN yang lebih kuat!"); return; }
-
         const idKasir = document.getElementById('login-id').value.trim();
+
+        if (!p1 || !p2) { showCustomAlert("Peringatan", "PIN baru wajib diisi!"); return; }
+        if (p1 !== p2) { showCustomAlert("Peringatan", "Konfirmasi PIN tidak cocok!"); return; }
+
         const params = new URLSearchParams();
         params.append('action', 'gantiPin');
         params.append('idKasir', idKasir);
@@ -459,14 +578,13 @@
         .then(res => res.json())
         .then(data => {
             if (data.status === "success") {
-                showMsg("PIN Berhasil diperbarui secara privat! Selamat bekerja.");
-                document.getElementById('login-screen').style.display = 'none';
-                checkKalkulatorData();
+                showCustomAlert("Sukses", "PIN berhasil diperbarui. Selamat bekerja!", "alert", "", () => {
+                    document.getElementById('login-screen').style.display = 'none';
+                });
             } else {
-                showMsg("Gagal memperbarui PIN: " + data.message);
+                showCustomAlert("Gagal", data.message);
             }
-        })
-        .catch(err => showMsg("Terjadi kesalahan sistem: " + err.message));
+        });
     }
 
     function addNewRow() {
@@ -487,7 +605,6 @@
     }
 
     function calculateTotal() {
-        if (isLunas) return;
         const rows = document.getElementById('invoice-table').getElementsByTagName('tbody')[0].rows;
         let subtotal = 0;
         for (let i = 0; i < rows.length; i++) {
@@ -498,55 +615,159 @@
             subtotal += totalRow;
         }
         document.getElementById('subtotal').value = subtotal;
-        const discount = parseFloat(document.getElementById('discount-amount').value) || 0;
+        
+        const discountInput = document.getElementById('discount-amount').value.toString();
+        let discountCalculated = 0;
+        const discountLabel = document.getElementById('discount-label');
+
+        if (discountInput) {
+            if (discountInput.includes('%') || discountInput.length <= 2) {
+                const pct = parseFloat(discountInput) || 0;
+                discountCalculated = (pct / 100) * subtotal;
+                discountLabel.innerText = `(${pct}%)`;
+            } else {
+                discountCalculated = parseFloat(discountInput) || 0;
+                discountLabel.innerText = "";
+            }
+        } else {
+            discountLabel.innerText = "";
+        }
+
+        const ppnRate = parseFloat(document.getElementById('ppn-rate').value) || 0;
+        const shippingCost = parseFloat(document.getElementById('shipping-cost').value) || 0;
+        
+        const totalAfterDiscount = subtotal - discountCalculated;
+        const ppnAmount = (ppnRate / 100) * totalAfterDiscount;
+        
+        const grandTotal = totalAfterDiscount + ppnAmount + shippingCost;
         const dp = parseFloat(document.getElementById('dp-amount').value) || 0;
-        document.getElementById('balance-due').value = (subtotal - discount) - dp;
+        
+        let sisaAkhir = grandTotal - dp;
+        if (sisaAkhir < 0) sisaAkhir = 0;
+        document.getElementById('balance-due').value = sisaAkhir;
+
+        const badge = document.getElementById('status-badge');
+        if (sisaAkhir <= 0 && subtotal > 0) {
+            isLunas = true;
+            document.getElementById('stamp').style.display = 'block';
+            badge.innerText = "STATUS: LUNAS";
+            badge.style.cssText = "background-color: #dcfce7; color: var(--success); border-color: #22c55e;";
+        } else {
+            isLunas = false;
+            document.getElementById('stamp').style.display = 'none';
+            if (dp > 0) {
+                badge.innerText = "STATUS: BELUM LUNAS (DP)";
+                badge.style.cssText = "background-color: #fef3c7; color: #b45309; border-color: #f59e0b;";
+            } else {
+                badge.innerText = "STATUS: BARU (DRAFT)";
+                badge.style.cssText = "background-color: #f1f5f9; color: #475569; border-color: #94a3b8;";
+            }
+        }
         updateQRCode();
     }
 
     function updateQRCode() {
-        const qrContent = JSON.stringify({
-            shop: "Yeny Gorden",
-            nota: document.getElementById('nota-num').value || '-',
-            nama: document.getElementById('client-name').value || '(Tanpa Nama)',
-            total: parseFloat(document.getElementById('subtotal').value) || 0,
-            diskon: parseFloat(document.getElementById('discount-amount').value) || 0,
-            dp: parseFloat(document.getElementById('dp-amount').value) || 0,
-            sisa: parseFloat(document.getElementById('balance-due').value) || 0,
-            status: isLunas ? "LUNAS" : "BELUM LUNAS (DP)",
-            kasir: namaKasirAktif
-        });
+        const noNota = document.getElementById('nota-num').value || '-';
         qrcode.clear(); 
-        qrcode.makeCode(qrContent); 
+        qrcode.makeCode(noNota); 
     }
 
     function simpanKeGoogleSheets(bukaCetakSetelahSelesai = false) {
         const nota = document.getElementById('nota-num').value || '-';
+        
+        const rows = document.getElementById('invoice-table').getElementsByTagName('tbody')[0].rows;
+        let detailItems = [];
+        for (let i = 0; i < rows.length; i++) {
+            const desc = rows[i].cells[0].querySelector('input').value || '';
+            const qty = parseFloat(rows[i].querySelector('.qty').value) || 0;
+            const price = parseFloat(rows[i].querySelector('.price').value) || 0;
+            detailItems.push({ desc, qty, price });
+        }
+
         const params = new URLSearchParams();
         params.append('action', 'simpanNota');
         params.append('nota', nota);
-        params.append('nama', document.getElementById('client-name').value || '(Tanpa Nama)');
-        params.append('total', parseFloat(document.getElementById('subtotal').value) || 0);
-        params.append('diskon', parseFloat(document.getElementById('discount-amount').value) || 0);
+        params.append('tanggal', document.getElementById('date-picker').value || '-');
+        params.append('nama', document.getElementById('client-name').value || '');
+        params.append('alamat', document.getElementById('client-address').value || '');
+        params.append('nohp', document.getElementById('client-phone').value || '');
+        params.append('proyek', document.getElementById('project-details').value || '');
+        params.append('items', JSON.stringify(detailItems));
+        params.append('subtotal', parseFloat(document.getElementById('subtotal').value) || 0);
+        params.append('diskon', document.getElementById('discount-amount').value || 0);
+        params.append('ppn', parseFloat(document.getElementById('ppn-rate').value) || 0);
+        params.append('ongkir', parseFloat(document.getElementById('shipping-cost').value) || 0);
         params.append('dp', parseFloat(document.getElementById('dp-amount').value) || 0);
         params.append('sisa', parseFloat(document.getElementById('balance-due').value) || 0);
         params.append('status', isLunas ? "LUNAS" : "BELUM LUNAS (DP)");
-        params.append('tanggal', document.getElementById('date-picker').value || '-');
         params.append('kasir', namaKasirAktif);
 
         fetch(WEB_APP_URL, { method: "POST", body: params })
-        .then(response => { if (!response.ok) throw new Error('Jaringan Bermasalah'); return response.json(); })
+        .then(response => response.json())
         .then(res => {
             if (bukaCetakSetelahSelesai) { window.print(); } 
-            else { showMsg(res.result === "updated" ? "Data Nota " + nota + " Diperbarui!" : "Sukses Disimpan ke Sheets."); }
+            else { showCustomAlert("Sukses", res.result === "updated" ? "Data Nota " + nota + " Berhasil Diperbarui!" : "Sukses Disimpan ke Sheets."); }
         })
         .catch(err => {
-            if (bukaCetakSetelahSelesai) { if (confirm("Gagal sinkron ke Google Sheets. Tetap cetak?")) window.print(); } 
-            else { showMsg("Gagal simpan ke Sheets: " + err.message); }
+            if (bukaCetakSetelahSelesai) { window.print(); } 
+            else { showCustomAlert("Error", "Gagal simpan data ke Google Sheets."); }
         });
     }
 
     function simpanLaluCetak() { simpanKeGoogleSheets(true); }
+
+    function renderDataKeLayar(data) {
+        document.getElementById('nota-num').value = data.nota;
+        document.getElementById('date-picker').value = data.tanggal;
+        document.getElementById('client-name').value = data.nama;
+        document.getElementById('client-address').value = data.alamat || '';
+        document.getElementById('client-phone').value = data.nohp || '';
+        document.getElementById('project-details').value = data.proyek || '';
+        document.getElementById('discount-amount').value = data.diskon || 0;
+        document.getElementById('ppn-rate').value = data.ppn || 0;
+        document.getElementById('shipping-cost').value = data.ongkir || 0;
+        document.getElementById('dp-amount').value = data.dp;
+
+        const tableBody = document.getElementById('invoice-table').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = "";
+        
+        if (data.items) {
+            const listItems = JSON.parse(data.items);
+            listItems.forEach(item => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td><input type="text" value="${item.desc}" placeholder="Deskripsi Pesanan"></td>
+                    <td class="align-right"><input type="number" class="qty" value="${item.qty}" min="0" oninput="calculateTotal()"></td>
+                    <td class="align-right"><input type="number" class="price" value="${item.price}" min="0" oninput="calculateTotal()"></td>
+                    <td class="align-right"><input type="number" class="row-total" value="${item.qty * item.price}" readonly></td>
+                    <td class="td-action"><button class="btn btn-delete" onclick="removeRow(this)">Hapus</button></td>
+                `;
+            });
+        } else {
+            addNewRow();
+        }
+        calculateTotal();
+    }
+
+    function cariNotaManual() {
+        const noNota = document.getElementById('search-nota').value.trim();
+        if (!noNota) { showCustomAlert("Peringatan", "Masukkan nomor nota!"); return; }
+
+        const params = new URLSearchParams();
+        params.append('action', 'getNota');
+        params.append('nota', noNota);
+
+        fetch(WEB_APP_URL, { method: "POST", body: params })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "found") {
+                renderDataKeLayar(data);
+                showCustomAlert("Sukses", "Nota ditemukan dan berhasil dimuat ke layar.");
+            } else {
+                showCustomAlert("Tidak Ditemukan", "Nomor nota tidak terdaftar.");
+            }
+        }).catch(err => showCustomAlert("Error", "Gagal menarik data."));
+    }
 
     function toggleScanner() {
         const area = document.getElementById('scanner-area');
@@ -564,82 +785,65 @@
         html5QrcodeScanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
             qrCodeMessage => {
                 try {
-                    const data = JSON.parse(qrCodeMessage);
-                    if (data.shop === "Yeny Gorden") {
+                    const scannedNota = qrCodeMessage.trim();
+                    if (scannedNota) {
                         html5QrcodeScanner.stop().then(() => { document.getElementById('scanner-area').style.display = 'none'; });
-                        if (data.sisa <= 0) { showMsg("Nota ini sudah LUNAS."); return; }
-
-                        const sisaLama = parseFloat(data.sisa) || 0;
-                        const inputBayar = prompt(`Sisa tagihan: Rp ${sisaLama.toLocaleString('id-ID')}\nMasukkan nominal bayar termin ini:`, sisaLama);
-                        if (!inputBayar || isNaN(inputBayar)) { showMsg("Batal."); return; }
-
-                        const nominalBayar = parseFloat(inputBayar);
-                        document.getElementById('nota-num').value = data.nota;
-                        document.getElementById('client-name').value = data.nama;
-                        document.getElementById('subtotal').value = data.total;
-                        document.getElementById('discount-amount').value = data.diskon || 0;
                         
-                        const dpBaru = (parseFloat(data.dp) || 0) + nominalBayar;
-                        document.getElementById('dp-amount').value = dpBaru;
-                        document.getElementById('item-desc').value = `Pembayaran Termin - Nota ${data.nota}`;
+                        const params = new URLSearchParams();
+                        params.append('action', 'getNota');
+                        params.append('nota', scannedNota);
 
-                        const rows = document.getElementById('invoice-table').getElementsByTagName('tbody')[0].rows;
-                        rows[0].querySelector('.qty').value = 1;
-                        rows[0].querySelector('.price').value = nominalBayar;
-                        rows[0].querySelector('.row-total').value = nominalBayar;
+                        fetch(WEB_APP_URL, { method: "POST", body: params })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status === "found") {
+                                const sisaLama = parseFloat(data.sisa) || 0;
+                                if (sisaLama <= 0) { showCustomAlert("Selesai", "Nota ini sudah LUNAS."); return; }
 
-                        const sisaAkhir = (parseFloat(data.total) - (parseFloat(data.diskon) || 0)) - dpBaru;
-                        const badge = document.getElementById('status-badge');
-                        
-                        if (sisaAkhir <= 0) {
-                            isLunas = true;
-                            document.getElementById('balance-due').value = 0;
-                            document.getElementById('stamp').style.display = 'block';
-                            badge.innerText = "STATUS: LUNAS";
-                            badge.style.cssText = "background-color: #dcfce7; color: var(--success); border-color: #22c55e;";
-                        } else {
-                            isLunas = false;
-                            document.getElementById('balance-due').value = sisaAkhir;
-                            document.getElementById('stamp').style.display = 'none';
-                            badge.innerText = "STATUS: TERMIN / CICILAN";
-                            badge.style.cssText = "background-color: #fef3c7; color: #b45309; border-color: #f59e0b;";
-                        }
-                        updateQRCode();
-                        simpanKeGoogleSheets(false);
+                                showCustomAlert(
+                                    `Pelunasan Nota ${scannedNota}`, 
+                                    `Sisa Tagihan: Rp ${sisaLama.toLocaleString('id-ID')}\nMasukkan nominal cicilan baru:`, 
+                                    "prompt", 
+                                    sisaLama, 
+                                    (inputBayar) => {
+                                        if (!inputBayar || isNaN(inputBayar)) { showCustomAlert("Batal", "Transaksi dibatalkan."); return; }
+                                        const nominalBayar = parseFloat(inputBayar);
+                                        
+                                        showCustomAlert("Informasi Termin", "Ini pembayaran termin/cicilan ke berapa?", "prompt", "2", (terminKe) => {
+                                            const noTermin = terminKe || "2";
+                                            
+                                            const paramsCicilan = new URLSearchParams();
+                                            paramsCicilan.append('action', 'simpanCicilan');
+                                            paramsCicilan.append('nota', scannedNota);
+                                            paramsCicilan.append('nominal', nominalBayar);
+                                            paramsCicilan.append('terminKe', noTermin);
+                                            paramsCicilan.append('kasir', namaKasirAktif);
+
+                                            fetch(WEB_APP_URL, { method: "POST", body: paramsCicilan })
+                                            .then(res => res.json())
+                                            .then(resCicil => {
+                                                if(resCicil.status === "success") {
+                                                    renderDataKeLayar(data);
+                                                    document.getElementById('dp-amount').value = resCicil.dpAktif;
+                                                    document.getElementById('balance-due').value = resCicil.sisaAktif;
+                                                    calculateTotal();
+                                                    showCustomAlert("Sukses", "Pembayaran cicilan aman masuk ke jurnal riwayat!");
+                                                } else {
+                                                    showCustomAlert("Gagal", resCicil.message);
+                                                }
+                                            });
+                                        });
+                                    }
+                                );
+                            } else {
+                                showCustomAlert("Gagal", "Nota tidak ditemukan.");
+                            }
+                        });
                     }
                 } catch (e) {}
             }, () => {}
-        ).catch(err => { showMsg("Gagal akses kamera: " + err); });
+        ).catch(err => { showCustomAlert("Kamera Error", "Gagal akses kamera."); });
     }
-
-    function checkKalkulatorData() {
-        const dataKiriman = localStorage.getItem('gordenInvoiceData');
-        if (dataKiriman) {
-            const daftarGorden = JSON.parse(dataKiriman);
-            const tableBody = document.getElementById('invoice-table').getElementsByTagName('tbody')[0];
-            
-            tableBody.innerHTML = "";
-            let ringkasanSpek = "";
-
-            daftarGorden.forEach((item, index) => {
-                const row = tableBody.insertRow();
-                row.innerHTML = `
-                    <td><input type="text" value="${item.nama} (${item.spesifikasi})"></td>
-                    <td class="align-right"><input type="number" class="qty" value="1" min="0" oninput="calculateTotal()"></td>
-                    <td class="align-right"><input type="number" class="price" value="${Math.round(item.harga)}" min="0" oninput="calculateTotal()"></td>
-                    <td class="align-right"><input type="number" class="row-total" value="${Math.round(item.harga)}" readonly></td>
-                    <td class="td-action"><button class="btn btn-delete" onclick="removeRow(this)">Hapus</button></td>
-                `;
-                ringkasanSpek += `${index + 1}. ${item.nama}: ${item.spesifikasi}\n`;
-            });
-
-            document.getElementById('project-details').value = ringkasanSpek;
-            calculateTotal();
-            localStorage.removeItem('gordenInvoiceData');
-        }
-    }
-
-    updateQRCode();
 </script>
 </body>
 </html>
