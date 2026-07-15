@@ -357,7 +357,7 @@
         </div>
         <div class="invoice-title-block">
             <div class="invoice-meta-title">
-                <h2>INVOICE</h2>
+                <h2 id="invoice-title">INVOICE</h2>
                 <div class="meta-inputs">
                     <div>No Nota: <input type="text" id="nota-num" value="" oninput="updateQRCode()"></div>
                     <div>Tanggal: <input type="date" id="date-picker"></div>
@@ -717,6 +717,15 @@
         if (sisaAkhir < 0) sisaAkhir = 0;
         document.getElementById('balance-due').value = sisaAkhir;
 
+        // --- UPDATE TULISAN JUDUL BESAR (INVOICE / ESTIMASI) ---
+        const invoiceTitle = document.getElementById('invoice-title');
+        if (dp === 0) {
+            invoiceTitle.innerText = "ESTIMASI";
+        } else {
+            invoiceTitle.innerText = "INVOICE";
+        }
+
+        // --- STATUS BADGE ---
         const badge = document.getElementById('status-badge');
         if (sisaAkhir <= 0 && subtotal > 0) {
             isLunas = true;
