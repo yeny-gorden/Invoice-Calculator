@@ -152,11 +152,32 @@ function hitung(w) {
     if(w.mode === 'curtain') {
         let mK = (w.jenis === 'lokal') ? Math.ceil((w.L + 0.2) / 0.4) * (w.T + 0.3) : (w.L + 0.2) * 3;
         if(w.model === 'tabtop') mK += 1.0;
+        
         let hargaKain = (w.jenis === 'vitrase') ? w.hVit : w.hKain;
         items.push({nama: "Kain", qty: mK.toFixed(2)+"m", harga: mK * hargaKain}, {nama: "Jahit Kain", qty: mK.toFixed(2)+"m", harga: mK * h.jahit});
-        if(w.model === 'smokring') { let n = Math.ceil(w.L * 24); if(n%2!==0) n++; items.push({nama: "Smokring", qty: n+"pcs", harga: n * h.smokring}); }
-        if(['smokring', 'tabtop', 'plisket'].includes(w.model)) { items.push({nama: (w.model === 'plisket' ? "Rell" : "Rollet"), qty: Lc+"m", harga: Lc * (w.model === 'plisket' ? h.rell : h.rollet)}, {nama: "Hook", qty: "1 set", harga: h.hook}, {nama: "Tali", qty: "1 set", harga: h.tali}); } else if(w.model === 'spiral') { items.push({nama: "Stick", qty: "1pcs", harga: h.stick}); }
-        if(w.vOn) { let mKvit = (w.vModel === 'spiral') ? (w.vL * w.vQ) : mK; items.push({nama: "Vitrase", qty: mKvit.toFixed(2)+"m", harga: mKvit * w.hVit}, {nama: "Jahit Vitrase", qty: mKvit.toFixed(2)+"m", harga: mKvit * h.jahit}, {nama: "Rell", qty: Lc+"m", harga: Lc * h.rell}); }
+        
+        if(w.model === 'smokring') { 
+            let n = Math.ceil(w.L * 24); if(n%2!==0) n++; 
+            items.push({nama: "Smokring", qty: n+"pcs", harga: n * h.smokring}); 
+        }
+        
+        if(['smokring', 'tabtop', 'plisket'].includes(w.model)) { 
+            items.push({nama: (w.model === 'plisket' ? "Rell" : "Rollet"), qty: Lc+"m", harga: Lc * (w.model === 'plisket' ? h.rell : h.rollet)}, {nama: "Hook", qty: "1 set", harga: h.hook}, {nama: "Tali", qty: "1 set", harga: h.tali}); 
+        } else if(w.model === 'spiral') { 
+            items.push({nama: "Stick", qty: "1pcs", harga: h.stick}); 
+        }
+        
+        if(w.vOn) { 
+            let mKvit;
+            if(w.model === 'tabtop' && w.vModel === 'plisket') {
+                mKvit = (w.L + 0.2) * 3;
+            } else {
+                mKvit = (w.vModel === 'spiral') ? (w.vL * w.vQ) : mK;
+            }
+            
+            items.push({nama: "Vitrase", qty: mKvit.toFixed(2)+"m", harga: mKvit * w.hVit}, {nama: "Jahit Vitrase", qty: mKvit.toFixed(2)+"m", harga: mKvit * h.jahit}, {nama: "Rell", qty: Lc+"m", harga: Lc * h.rell}); 
+        }
+        
         items.push({nama: "Instalasi", qty: Lc+"m", harga: Lc * h.instalasi});
     } else {
         let luas = Math.max(w.L, 1) * Math.max(w.T, 1);
