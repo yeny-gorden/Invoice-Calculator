@@ -267,10 +267,27 @@
             display: inline-block;
         }
 
+        /* --- NOTIFIKASI INDIKATOR OFFLINE --- */
+        #offline-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #dc2626;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 99999;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
         @media print {
             body { background: #fff; padding: 0; }
             .invoice-container { box-shadow: none; padding: 0; width: 100%; }
-            .action-bar, #scanner-area, .btn-delete, .th-action, .td-action, #login-screen, .table-actions-row, #custom-alert-overlay { display: none !important; }
+            .action-bar, #scanner-area, .btn-delete, .th-action, .td-action, #login-screen, .table-actions-row, #custom-alert-overlay, #floating-payment-modal, #offline-indicator { display: none !important; }
             input, textarea { border: none !important; background: transparent !important; pointer-events: none; color: #000 !important; }
             .info-card { border: 2px solid #000; }
             table { border: 2px solid #000; }
@@ -287,6 +304,8 @@
     </style>
 </head>
 <body>
+
+<div id="offline-indicator">⚠️ Mode Offline: Koneksi internet terputus. Data disimpan lokal.</div>
 
 <div id="custom-alert-overlay">
     <div class="alert-box">
@@ -443,14 +462,42 @@
     </div>
 </div>
 
+<!-- --- FLOATING MENU INPUT PEMBAYARAN TERMIN --- -->
+<div id="floating-payment-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; justify-content: center; align-items: center;">
+    <div style="background: #ffffff; padding: 25px; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); border-top: 6px solid #166534;">
+        <h3 id="float-modal-title" style="margin: 0 0 5px 0; color: #0f172a; font-weight: 800; font-size: 18px;">Input Pembayaran Termin</h3>
+        <p id="float-modal-subtitle" style="margin: 0 0 15px 0; color: #64748b; font-size: 13px; font-weight: 600;">Nota: <span id="float-nota-text">-</span></p>
+        
+        <div style="margin-bottom: 12px;">
+            <label style="font-size: 13px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Sisa Tagihan Saat Ini:</label>
+            <div style="font-size: 20px; font-weight: 800; color: #9a3412;">Rp <span id="float-sisa-tagihan">0</span></div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+            <label style="font-size: 13px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Nominal Pembayaran (Rp):</label>
+            <input type="number" id="float-input-nominal" placeholder="0" style="width: 100%; padding: 10px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 16px; font-weight: 700; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label style="font-size: 13px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Pembayaran Termin Ke-:</label>
+            <input type="number" id="float-input-termin" value="2" min="2" style="width: 100%; padding: 10px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 15px; font-weight: 700; box-sizing: border-box; text-align: center;">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button class="btn btn-delete" style="padding: 10px 16px;" onclick="closeFloatingPayment()">Batal</button>
+            <button class="btn" style="background: #166534; color: white; padding: 10px 20px;" onclick="prosesBayarFloating()">Simpan Pembayaran</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    // MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbySJJFsyBrryW_FRmzuM0hsQx1kkAzzBfUiSebEPXCjytKp70l3LD3QRh__CqkIg-8/exec";
 
     let namaKasirAktif = "";
     let isLunas = false;
     let html5QrcodeScanner;
     let currentAlertCallback = null;
+    let dataNotaTerpilih = null; 
 
     function showCustomAlert(title, message, type = "alert", defaultValue = "", callback = null) {
         document.getElementById('alert-title').innerText = title;
@@ -527,7 +574,25 @@
             addNewRow();
         }
         calculateTotal();
+
+        // Cek koneksi & jalankan sinkronisasi data tertunda
+        window.addEventListener('online', handleOnlineStatus);
+        window.addEventListener('offline', handleOfflineStatus);
+        if (navigator.onLine) {
+            syncPendingData();
+        } else {
+            handleOfflineStatus();
+        }
     };
+
+    function handleOnlineStatus() {
+        document.getElementById('offline-indicator').style.display = 'none';
+        syncPendingData();
+    }
+
+    function handleOfflineStatus() {
+        document.getElementById('offline-indicator').style.display = 'block';
+    }
 
     function prosesLogin() {
         const idKasir = document.getElementById('login-id').value.trim();
@@ -558,7 +623,13 @@
                 showCustomAlert("Gagal", data.message);
             }
         })
-        .catch(err => showCustomAlert("Error", "Gagal terhubung ke server login. Pastikan URL Web App benar."));
+        .catch(err => {
+            // Toleransi login offline demi kelancaran lokal
+            namaKasirAktif = idKasir || "Kasir Lokal";
+            document.getElementById('txt-nama-kasir').innerText = namaKasirAktif;
+            document.getElementById('login-screen').style.display = 'none';
+            showCustomAlert("Offline Login", "Masuk dengan mode lokal (tanpa internet).");
+        });
     }
 
     function prosesGantiPIN() {
@@ -684,23 +755,37 @@
             detailItems.push({ desc, qty, price });
         }
 
+        const dataPayload = {
+            action: 'simpanNota',
+            nota: nota,
+            tanggal: document.getElementById('date-picker').value || '-',
+            nama: document.getElementById('client-name').value || '',
+            alamat: document.getElementById('client-address').value || '',
+            nohp: document.getElementById('client-phone').value || '',
+            proyek: document.getElementById('project-details').value || '',
+            items: JSON.stringify(detailItems),
+            subtotal: parseFloat(document.getElementById('subtotal').value) || 0,
+            diskon: document.getElementById('discount-amount').value || 0,
+            ppn: parseFloat(document.getElementById('ppn-rate').value) || 0,
+            ongkir: parseFloat(document.getElementById('shipping-cost').value) || 0,
+            dp: parseFloat(document.getElementById('dp-amount').value) || 0,
+            sisa: parseFloat(document.getElementById('balance-due').value) || 0,
+            status: isLunas ? "LUNAS" : "BELUM LUNAS (DP)",
+            kasir: namaKasirAktif
+        };
+
         const params = new URLSearchParams();
-        params.append('action', 'simpanNota');
-        params.append('nota', nota);
-        params.append('tanggal', document.getElementById('date-picker').value || '-');
-        params.append('nama', document.getElementById('client-name').value || '');
-        params.append('alamat', document.getElementById('client-address').value || '');
-        params.append('nohp', document.getElementById('client-phone').value || '');
-        params.append('proyek', document.getElementById('project-details').value || '');
-        params.append('items', JSON.stringify(detailItems));
-        params.append('subtotal', parseFloat(document.getElementById('subtotal').value) || 0);
-        params.append('diskon', document.getElementById('discount-amount').value || 0);
-        params.append('ppn', parseFloat(document.getElementById('ppn-rate').value) || 0);
-        params.append('ongkir', parseFloat(document.getElementById('shipping-cost').value) || 0);
-        params.append('dp', parseFloat(document.getElementById('dp-amount').value) || 0);
-        params.append('sisa', parseFloat(document.getElementById('balance-due').value) || 0);
-        params.append('status', isLunas ? "LUNAS" : "BELUM LUNAS (DP)");
-        params.append('kasir', namaKasirAktif);
+        for (let key in dataPayload) { params.append(key, dataPayload[key]); }
+
+        // Simpan salinan lokal ke cache agar data di layar tidak hilang
+        localStorage.setItem('local_backup_' + nota, JSON.stringify(dataPayload));
+
+        if (!navigator.onLine) {
+            pushToOfflineQueue('nota', dataPayload);
+            if (bukaCetakSetelahSelesai) { window.print(); }
+            else { showCustomAlert("Offline", "Koneksi terputus! Nota disimpan di memori lokal & akan otomatis disinkronkan saat online."); }
+            return;
+        }
 
         fetch(WEB_APP_URL, { method: "POST", body: params })
         .then(response => response.json())
@@ -709,8 +794,9 @@
             else { showCustomAlert("Sukses", res.result === "updated" ? "Data Nota " + nota + " Berhasil Diperbarui!" : "Sukses Disimpan ke Sheets."); }
         })
         .catch(err => {
+            pushToOfflineQueue('nota', dataPayload);
             if (bukaCetakSetelahSelesai) { window.print(); } 
-            else { showCustomAlert("Error", "Gagal simpan data ke Google Sheets."); }
+            else { showCustomAlert("Offline Terdeteksi", "Gagal mengirim ke Sheets. Data aman tersimpan di memori browser Anda."); }
         });
     }
 
@@ -749,9 +835,106 @@
         calculateTotal();
     }
 
+    // --- KONTROL UNTUK MENU FLOATING PEMBAYARAN TERMIN ---
+    function openFloatingPayment(data) {
+        const sisa = parseFloat(data.sisa) || 0;
+        if (sisa <= 0) {
+            showCustomAlert("Selesai", "Nota ini sudah LUNAS.");
+            return;
+        }
+
+        dataNotaTerpilih = data;
+        document.getElementById('float-nota-text').innerText = data.nota;
+        document.getElementById('float-sisa-tagihan').innerText = sisa.toLocaleString('id-ID');
+        document.getElementById('float-input-nominal').value = sisa; 
+        document.getElementById('float-input-termin').value = "2"; 
+        
+        document.getElementById('floating-payment-modal').style.display = "flex";
+    }
+
+    function closeFloatingPayment() {
+        document.getElementById('floating-payment-modal').style.display = "none";
+        dataNotaTerpilih = null;
+    }
+
+    function prosesBayarFloating() {
+        if (!dataNotaTerpilih) return;
+
+        const inputNominal = document.getElementById('float-input-nominal').value;
+        const inputTermin = document.getElementById('float-input-termin').value;
+
+        if (!inputNominal || isNaN(inputNominal) || parseFloat(inputNominal) <= 0) {
+            showCustomAlert("Peringatan", "Masukkan nominal pembayaran yang valid!");
+            return;
+        }
+
+        const nominalBayar = parseFloat(inputNominal);
+        const noTermin = inputTermin || "2";
+        const scannedNota = dataNotaTerpilih.nota;
+
+        closeFloatingPayment();
+
+        const dataCicilanPayload = {
+            action: 'simpanCicilan',
+            nota: scannedNota,
+            nominal: nominalBayar,
+            terminKe: noTermin,
+            kasir: namaKasirAktif
+        };
+
+        // Perbarui simulasi angka di layar secara offline terlebih dahulu
+        let dpLama = parseFloat(document.getElementById('dp-amount').value) || 0;
+        let sisaLama = parseFloat(document.getElementById('balance-due').value) || 0;
+        let dpBaru = dpLama + nominalBayar;
+        let sisaBaru = sisaLama - nominalBayar;
+        if(sisaBaru < 0) sisaBaru = 0;
+
+        document.getElementById('dp-amount').value = dpBaru;
+        document.getElementById('balance-due').value = sisaBaru;
+        calculateTotal();
+
+        if (!navigator.onLine) {
+            pushToOfflineQueue('cicilan', dataCicilanPayload);
+            showCustomAlert("Offline", "Koneksi terputus! Pembayaran dicatat lokal dan akan disinkronkan otomatis saat sinyal kembali.");
+            return;
+        }
+
+        showCustomAlert("Memproses", "Sedang menyimpan pembayaran cicilan...");
+        const paramsCicilan = new URLSearchParams();
+        for (let key in dataCicilanPayload) { paramsCicilan.append(key, dataCicilanPayload[key]); }
+
+        fetch(WEB_APP_URL, { method: "POST", body: paramsCicilan })
+        .then(res => res.json())
+        .then(resCicil => {
+            if(resCicil.status === "success") {
+                document.getElementById('dp-amount').value = resCicil.dpAktif;
+                document.getElementById('balance-due').value = resCicil.sisaAktif;
+                calculateTotal();
+                showCustomAlert("Sukses", "Pembayaran cicilan aman masuk ke jurnal riwayat!");
+            } else {
+                showCustomAlert("Gagal", resCicil.message);
+            }
+        })
+        .catch(err => {
+            pushToOfflineQueue('cicilan', dataCicilanPayload);
+            showCustomAlert("Offline Terdeteksi", "Gagal sinkron. Transaksi diamankan ke antrean offline.");
+        });
+    }
+
     function cariNotaManual() {
         const noNota = document.getElementById('search-nota').value.trim();
         if (!noNota) { showCustomAlert("Peringatan", "Masukkan nomor nota!"); return; }
+
+        // Jika offline, coba cari dari backup lokal yang pernah disimpan di perangkat ini
+        if (!navigator.onLine) {
+            const localBackup = localStorage.getItem('local_backup_' + noNota);
+            if (localBackup) {
+                const dataObj = JSON.parse(localBackup);
+                renderDataKeLayar(dataObj);
+                setTimeout(() => { openFloatingPayment(dataObj); }, 500);
+                return;
+            }
+        }
 
         const params = new URLSearchParams();
         params.append('action', 'getNota');
@@ -762,11 +945,23 @@
         .then(data => {
             if (data.status === "found") {
                 renderDataKeLayar(data);
-                showCustomAlert("Sukses", "Nota ditemukan dan berhasil dimuat ke layar.");
+                // Simpan cache lokal untuk dibaca jika sewaktu-waktu offline
+                localStorage.setItem('local_backup_' + data.nota, JSON.stringify(data));
+                setTimeout(() => { openFloatingPayment(data); }, 500);
             } else {
                 showCustomAlert("Tidak Ditemukan", "Nomor nota tidak terdaftar.");
             }
-        }).catch(err => showCustomAlert("Error", "Gagal menarik data."));
+        }).catch(err => {
+            // Fallback backup lokal jika gagal fetch di tengah jalan akibat gangguan sinyal
+            const localBackup = localStorage.getItem('local_backup_' + noNota);
+            if (localBackup) {
+                const dataObj = JSON.parse(localBackup);
+                renderDataKeLayar(dataObj);
+                setTimeout(() => { openFloatingPayment(dataObj); }, 500);
+            } else {
+                showCustomAlert("Error", "Gagal menarik data. Koneksi internet bermasalah.");
+            }
+        });
     }
 
     function toggleScanner() {
@@ -789,6 +984,16 @@
                     if (scannedNota) {
                         html5QrcodeScanner.stop().then(() => { document.getElementById('scanner-area').style.display = 'none'; });
                         
+                        if (!navigator.onLine) {
+                            const localBackup = localStorage.getItem('local_backup_' + scannedNota);
+                            if (localBackup) {
+                                const dataObj = JSON.parse(localBackup);
+                                renderDataKeLayar(dataObj);
+                                setTimeout(() => { openFloatingPayment(dataObj); }, 500);
+                                return;
+                            }
+                        }
+
                         const params = new URLSearchParams();
                         params.append('action', 'getNota');
                         params.append('nota', scannedNota);
@@ -797,44 +1002,9 @@
                         .then(res => res.json())
                         .then(data => {
                             if (data.status === "found") {
-                                const sisaLama = parseFloat(data.sisa) || 0;
-                                if (sisaLama <= 0) { showCustomAlert("Selesai", "Nota ini sudah LUNAS."); return; }
-
-                                showCustomAlert(
-                                    `Pelunasan Nota ${scannedNota}`, 
-                                    `Sisa Tagihan: Rp ${sisaLama.toLocaleString('id-ID')}\nMasukkan nominal cicilan baru:`, 
-                                    "prompt", 
-                                    sisaLama, 
-                                    (inputBayar) => {
-                                        if (!inputBayar || isNaN(inputBayar)) { showCustomAlert("Batal", "Transaksi dibatalkan."); return; }
-                                        const nominalBayar = parseFloat(inputBayar);
-                                        
-                                        showCustomAlert("Informasi Termin", "Ini pembayaran termin/cicilan ke berapa?", "prompt", "2", (terminKe) => {
-                                            const noTermin = terminKe || "2";
-                                            
-                                            const paramsCicilan = new URLSearchParams();
-                                            paramsCicilan.append('action', 'simpanCicilan');
-                                            paramsCicilan.append('nota', scannedNota);
-                                            paramsCicilan.append('nominal', nominalBayar);
-                                            paramsCicilan.append('terminKe', noTermin);
-                                            paramsCicilan.append('kasir', namaKasirAktif);
-
-                                            fetch(WEB_APP_URL, { method: "POST", body: paramsCicilan })
-                                            .then(res => res.json())
-                                            .then(resCicil => {
-                                                if(resCicil.status === "success") {
-                                                    renderDataKeLayar(data);
-                                                    document.getElementById('dp-amount').value = resCicil.dpAktif;
-                                                    document.getElementById('balance-due').value = resCicil.sisaAktif;
-                                                    calculateTotal();
-                                                    showCustomAlert("Sukses", "Pembayaran cicilan aman masuk ke jurnal riwayat!");
-                                                } else {
-                                                    showCustomAlert("Gagal", resCicil.message);
-                                                }
-                                            });
-                                        });
-                                    }
-                                );
+                                renderDataKeLayar(data);
+                                localStorage.setItem('local_backup_' + data.nota, JSON.stringify(data));
+                                setTimeout(() => { openFloatingPayment(data); }, 500);
                             } else {
                                 showCustomAlert("Gagal", "Nota tidak ditemukan.");
                             }
@@ -843,6 +1013,44 @@
                 } catch (e) {}
             }, () => {}
         ).catch(err => { showCustomAlert("Kamera Error", "Gagal akses kamera."); });
+    }
+
+    // --- ENGINE MANAJEMEN ANTREAN OFFLINE ---
+    function pushToOfflineQueue(type, payload) {
+        let queue = JSON.parse(localStorage.getItem('offline_payment_queue')) || [];
+        queue.push({ type, payload, timestamp: new Date().getTime() });
+        localStorage.setItem('offline_payment_queue', JSON.stringify(queue));
+    }
+
+    function syncPendingData() {
+        let queue = JSON.parse(localStorage.getItem('offline_payment_queue')) || [];
+        if (queue.length === 0) return;
+
+        console.log("Menemukan " + queue.length + " data tertunda. Memulai sinkronisasi otomatis...");
+        
+        // Ambil item pertama dari antrean untuk dikirim
+        let currentItem = queue[0];
+        const params = new URLSearchParams();
+        for (let key in currentItem.payload) { params.append(key, currentItem.payload[key]); }
+
+        fetch(WEB_APP_URL, { method: "POST", body: params })
+        .then(res => res.json())
+        .then(result => {
+            // Jika sukses terkirim, hapus dari antrean lokal
+            queue.shift();
+            localStorage.setItem('offline_payment_queue', JSON.stringify(queue));
+            
+            // Rekursif jalankan lagi sampai antrean habis
+            if(queue.length > 0) {
+                syncPendingData();
+            } else {
+                showCustomAlert("Sinkronisasi Berhasil", "Semua transaksi offline yang tertunda telah berhasil disimpan ke Google Sheets!");
+                calculateTotal();
+            }
+        })
+        .catch(err => {
+            console.log("Gagal sinkronisasi otomatis, internet belum stabil. Mencoba lagi nanti.");
+        });
     }
 </script>
 </body>
