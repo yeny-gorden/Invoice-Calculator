@@ -2,279 +2,198 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Gorden - Yeny Gorden</title>
+    <title>Kalkulator Gorden & Blinds Pro</title>
     <style>
-        :root {
-            --primary: #0f172a;       
-            --accent: #9a3412;        
-            --bg-light: #f8fafc;
-            --text-main: #1e293b;     
-            --border: #cbd5e1;        
-        }
+        :root { --bg: #121212; --panel: #1e1e1e; --text: #e0e0e0; --accent: #bb86fc; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; padding: 20px; display: flex; flex-wrap: wrap; gap: 20px; }
+        .panel { background: var(--panel); padding: 20px; border-radius: 12px; flex: 1; min-width: 350px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        input, select, button { width: 100%; padding: 10px; margin: 5px 0; background: #333; color: white; border: 1px solid #444; border-radius: 6px; box-sizing: border-box; }
+        button { background: var(--accent); color: #000; font-weight: bold; cursor: pointer; }
+        .hidden { display: none; }
+        .switch-wrapper { position: relative; width: 100%; height: 50px; background: #2a2a2a; border-radius: 25px; display: flex; align-items: center; cursor: pointer; margin-bottom: 15px; }
+        .switch-toggle { position: absolute; left: 5px; width: 48%; height: 40px; background: var(--accent); border-radius: 20px; transition: 0.3s; }
+        .mode-blinds .switch-toggle { transform: translateX(100%); }
+        .window-card { border: 1px solid #444; padding: 15px; margin-bottom: 10px; border-radius: 8px; background: #252525; }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            margin: 0;
-            padding: 30px 20px;
-            background-color: #cbd5e1;
-            color: var(--text-main);
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.75); display: flex; align-items: center; justify-content: center;
+            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
         }
-
-        .calc-container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 35px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        .header-title {
-            text-align: center;
-            border-bottom: 3px solid var(--primary);
-            padding-bottom: 15px;
-            margin-bottom: 30px;
-        }
-
-        .header-title h1 {
-            margin: 0;
-            font-size: 28px;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .header-title p {
-            margin: 5px 0 0 0;
-            color: var(--accent);
-            font-weight: 600;
-            font-style: italic;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        th {
-            background-color: var(--primary);
-            color: #ffffff;
-            padding: 12px;
-            font-size: 13px;
-            text-transform: uppercase;
-        }
-
-        td {
-            padding: 10px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        input, select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        input:focus, select:focus {
-            border-color: var(--accent);
-            outline: none;
-            background-color: var(--bg-light);
-        }
-
-        .align-right {
-            text-align: right;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            font-size: 14px;
-            font-weight: 700;
-            border-radius: 6px;
-            cursor: pointer;
-            border: none;
-            transition: 0.2s;
-        }
-
-        .btn-add {
-            background-color: var(--bg-light);
-            color: var(--primary);
-            border: 1px solid var(--border);
-        }
-
-        .btn-delete {
-            background: transparent;
-            color: #dc2626;
-        }
-
-        .bottom-actions {
-            margin-top: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 2px dashed var(--border);
-            padding-top: 20px;
-        }
-
-        .grand-total-box {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--accent);
-        }
-
-        .btn-next {
-            background-color: var(--accent);
-            color: white;
-            padding: 12px 30px;
-            font-size: 16px;
-        }
-
-        .btn:hover {
-            opacity: 0.9;
-        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-content { background: var(--panel); border: 2px solid var(--accent); border-radius: 12px; width: 100%; max-width: 450px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); transform: scale(0.85); transition: transform 0.25s ease; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-header { font-size: 1.25rem; font-weight: bold; color: var(--accent); border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px; text-transform: uppercase; }
+        .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #2d2d2d; }
     </style>
 </head>
 <body>
 
-<div class="calc-container">
-    <div class="header-title">
-        <h1>Kalkulator Estimasi Gorden</h1>
-        <p>Yeny Gorden Purwokerto</p>
+<div class="panel">
+    <h2>Input Data</h2>
+    <div class="switch-wrapper" onclick="toggleMode()" id="switchBox">
+        <div class="switch-toggle"></div>
+        <div style="flex:1; text-align:center; font-weight:bold; z-index:1; color: #fff;">CURTAIN</div>
+        <div style="flex:1; text-align:center; font-weight:bold; z-index:1; color: #fff;">BLINDS</div>
     </div>
 
-    <table id="calc-table">
-        <thead>
-            <tr>
-                <th style="width: 25%;">Nama Item / Ruangan</th>
-                <th style="width: 12%;">Lebar (m)</th>
-                <th style="width: 12%;">Tinggi (m)</th>
-                <th style="width: 15%;">Model Gorden</th>
-                <th style="width: 18%;">Harga Bahan /m</th>
-                <th style="width: 15%;">Total</th>
-                <th style="width: 3%;"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Baris kalkulasi akan masuk di sini -->
-        </tbody>
-    </table>
+    <input type="text" id="nama" placeholder="Nama Jendela">
 
-    <button class="btn btn-add" onclick="tambahBarisKalkulator()">+ Tambah Item</button>
-
-    <div class="bottom-actions">
-        <div class="grand-total-box">
-            Total Estimasi: Rp <span id="grand-total-text">0</span>
+    <div id="curtainFields">
+        <div class="grid-2">
+            <input type="number" id="lebar" placeholder="Lebar (m)">
+            <input type="number" id="tinggi" placeholder="Tinggi (m)">
+            <input type="number" id="hKain" placeholder="Harga Kain Utama/m">
+            <input type="number" id="hVitras" placeholder="Harga Vitrase/m">
         </div>
-        <button class="btn btn-next" onclick="lanjutKeInvoice()">Lanjut ke Invoice &raquo;</button>
+        <select id="model" onchange="checkModel()">
+            <option value="smokring">Smokring</option>
+            <option value="plisket">Plisket</option>
+            <option value="tabtop">Tab Top</option>
+            <option value="spiral">Spiral</option>
+        </select>
+        <select id="jenisKain">
+            <option value="import">Import</option>
+            <option value="lokal">Lokal</option>
+            <option value="vitrase">Kain Vitrase</option>
+        </select>
+        
+        <div style="display:flex; align-items:center; gap:10px; margin:10px 0;">
+            <label>Vitrase Tambahan:</label>
+            <button id="btnVitrase" onclick="toggleVitrase()" style="width:100px;">OFF</button>
+        </div>
+        <div id="vContainer" class="hidden">
+            <select id="vModel" onchange="updateVitraseUI()">
+                <option value="plisket">Vitrase Plisket</option>
+                <option value="spiral">Vitrase Spiral</option>
+            </select>
+            <div id="vInputSpiral" class="grid-2 hidden">
+                <input type="number" id="vL" placeholder="L (m)"><input type="number" id="vT" placeholder="T (m)"><input type="number" id="vQ" placeholder="Qty">
+            </div>
+        </div>
+    </div>
+
+    <div id="blindsFields" class="hidden">
+        <div class="grid-2">
+            <input type="number" id="bL" placeholder="Lebar (m)">
+            <input type="number" id="bT" placeholder="Tinggi (m)">
+            <input type="number" id="bHarga" placeholder="Harga/m²">
+        </div>
+    </div>
+    <button onclick="tambah()">TAMBAH JENDELA</button>
+</div>
+
+<div class="panel">
+    <h2>Daftar Jendela</h2>
+    <div id="daftarJendela"></div>
+    <h3 id="totalSemua">Total: Rp 0</h3>
+    <button onclick="lanjutKeInvoice()" style="background:#28a745; color: white; width:100%; padding:15px; margin-top:20px; font-size:18px; border: none; border-radius: 6px; font-weight: bold;">LANJUT KE INVOICE</button>
+</div>
+
+<div id="customModal" class="modal-overlay" onclick="tutupModalLuar(event)">
+    <div class="modal-content">
+        <div id="modalTitle" class="modal-header">Rincian Perhitungan</div>
+        <div id="modalBody" class="modal-body"></div>
+        <div class="modal-footer" style="margin-top:20px;">
+            <button onclick="tutupModal()">TUTUP</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // Jalankan satu baris kosong saat pertama kali dibuka
-    window.onload = function() {
-        tambahBarisKalkulator();
-    };
+let list = []; let mode = 'curtain'; let vOn = false;
+const h = { jahit: 20000, smokring: 4500, rollet: 65000, rell: 50000, hook: 40000, tali: 50000, stick: 50000, instalasi: 50000 };
 
-    function tambahBarisKalkulator() {
-        const tbody = document.getElementById('calc-table').getElementsByTagName('tbody')[0];
-        const row = tbody.insertRow();
-        
-        row.innerHTML = `
-            <td><input type="text" class="nama-item" placeholder="Contoh: Gorden Ruang Tamu"></td>
-            <td><input type="number" class="lebar" value="1" min="0" step="0.1" oninput="hitungBaris(this)"></td>
-            <td><input type="number" class="tinggi" value="1" min="0" step="0.1" oninput="hitungBaris(this)"></td>
-            <td>
-                <select class="model" onchange="hitungBaris(this)">
-                    <option value="2.8">Smokering (x2.8)</option>
-                    <option value="2.5">Plisket (x2.5)</option>
-                    <option value="1">Minimalis / Blinds (x1)</option>
-                </select>
-            </td>
-            <td><input type="number" class="harga" value="0" min="0" oninput="hitungBaris(this)"></td>
-            <td><input type="number" class="total-harga" value="0" readonly style="text-align: right; background: #f1f5f9;"></td>
-            <td><button class="btn btn-delete" onclick="hapusBaris(this)">✕</button></td>
-        `;
+function checkModel() {
+    const model = document.getElementById('model').value;
+    const btnV = document.getElementById('btnVitrase');
+    if(model === 'spiral') {
+        document.getElementById('jenisKain').value = 'vitrase';
+        vOn = false; btnV.innerText = "OFF"; btnV.disabled = true;
+        document.getElementById('vContainer').classList.add('hidden');
+    } else {
+        btnV.disabled = false;
     }
+}
 
-    function hapusBaris(btn) {
-        const row = btn.parentNode.parentNode;
-        const tbody = row.parentNode;
-        row.remove();
-        if (tbody.rows.length === 0) {
-            tambahBarisKalkulator();
-        }
-        hitungGrandTotal();
+function toggleMode() {
+    mode = (mode === 'curtain') ? 'blinds' : 'curtain';
+    document.getElementById('switchBox').classList.toggle('mode-blinds');
+    document.getElementById('curtainFields').classList.toggle('hidden');
+    document.getElementById('blindsFields').classList.toggle('hidden');
+}
+
+function toggleVitrase() {
+    if(document.getElementById('model').value === 'spiral') return;
+    vOn = !vOn;
+    document.getElementById('btnVitrase').innerText = vOn ? "ON" : "OFF";
+    document.getElementById('vContainer').classList.toggle('hidden', !vOn);
+    updateVitraseUI();
+}
+
+function updateVitraseUI() {
+    const isSpiral = document.getElementById('vModel').value === 'spiral';
+    document.getElementById('vInputSpiral').classList.toggle('hidden', !(vOn && isSpiral));
+}
+
+function tambah() {
+    let obj = { id: Date.now(), mode, nama: document.getElementById('nama').value || (mode === 'curtain' ? "Gorden" : "Blinds") };
+    if(mode === 'curtain') {
+        Object.assign(obj, { L: +document.getElementById('lebar').value, T: +document.getElementById('tinggi').value, hKain: +document.getElementById('hKain').value, hVit: +document.getElementById('hVitras').value, model: document.getElementById('model').value, jenis: document.getElementById('jenisKain').value, vOn, vModel: document.getElementById('vModel').value, vL: +document.getElementById('vL').value, vT: +document.getElementById('vT').value, vQ: +document.getElementById('vQ').value });
+    } else {
+        Object.assign(obj, { h: +document.getElementById('bHarga').value, L: +document.getElementById('bL').value, T: +document.getElementById('bT').value });
     }
+    list.push(obj); render();
+}
 
-    function hitungBaris(element) {
-        const row = element.parentNode.parentNode;
-        const lebar = parseFloat(row.querySelector('.lebar').value) || 0;
-        const tinggi = parseFloat(row.querySelector('.tinggi').value) || 0;
-        const pengaliModel = parseFloat(row.querySelector('.model').value) || 1;
-        const hargaBahan = parseFloat(row.querySelector('.harga').value) || 0;
-
-        let totalItem = 0;
-
-        if (pengaliModel === 1) {
-            // Rumus hitung Blinds / minimalis (Luas m2 langsung dikali harga)
-            // Jika tinggi atau lebar kurang dari 1 meter, biasanya dihitung minimal 1 meter sesuai aturan toko
-            const lEfektif = lebar < 1 && lebar > 0 ? 1 : lebar;
-            const tEfektif = tinggi < 1 && tinggi > 0 ? 1 : tinggi;
-            totalItem = lEfektif * tEfektif * hargaBahan;
-        } else {
-            // Rumus Gorden Kain meter lari standar kain tinggi 2.8m
-            // Pemakaian bahan = Lebar jendela x Pengali lipatan model gorden
-            const pemakaianBahan = lebar * pengaliModel;
-            totalItem = pemakaianBahan * hargaBahan;
-        }
-
-        row.querySelector('.total-harga').value = Math.round(totalItem);
-        hitungGrandTotal();
+function hitung(w) {
+    let items = [], Lc = Math.max(w.L, 1);
+    if(w.mode === 'curtain') {
+        let mK = (w.jenis === 'lokal') ? Math.ceil((w.L + 0.2) / 0.4) * (w.T + 0.3) : (w.L + 0.2) * 3;
+        if(w.model === 'tabtop') mK += 1.0;
+        let hargaKain = (w.jenis === 'vitrase') ? w.hVit : w.hKain;
+        items.push({nama: "Kain", qty: mK.toFixed(2)+"m", harga: mK * hargaKain}, {nama: "Jahit Kain", qty: mK.toFixed(2)+"m", harga: mK * h.jahit});
+        if(w.model === 'smokring') { let n = Math.ceil(w.L * 24); if(n%2!==0) n++; items.push({nama: "Smokring", qty: n+"pcs", harga: n * h.smokring}); }
+        if(['smokring', 'tabtop', 'plisket'].includes(w.model)) { items.push({nama: (w.model === 'plisket' ? "Rell" : "Rollet"), qty: Lc+"m", harga: Lc * (w.model === 'plisket' ? h.rell : h.rollet)}, {nama: "Hook", qty: "1 set", harga: h.hook}, {nama: "Tali", qty: "1 set", harga: h.tali}); } else if(w.model === 'spiral') { items.push({nama: "Stick", qty: "1pcs", harga: h.stick}); }
+        if(w.vOn) { let mKvit = (w.vModel === 'spiral') ? (w.vL * w.vQ) : mK; items.push({nama: "Vitrase", qty: mKvit.toFixed(2)+"m", harga: mKvit * w.hVit}, {nama: "Jahit Vitrase", qty: mKvit.toFixed(2)+"m", harga: mKvit * h.jahit}, {nama: "Rell", qty: Lc+"m", harga: Lc * h.rell}); }
+        items.push({nama: "Instalasi", qty: Lc+"m", harga: Lc * h.instalasi});
+    } else {
+        let luas = Math.max(w.L, 1) * Math.max(w.T, 1);
+        items.push({nama: "Blinds", qty: luas+"m²", harga: luas * w.h}, {nama: "Instalasi", qty: Lc+"m", harga: Lc * h.instalasi});
     }
+    return { items, total: items.reduce((s, i) => s + i.harga, 0) };
+}
 
-    function hitungGrandTotal() {
-        const rows = document.getElementById('calc-table').getElementsByTagName('tbody')[0].rows;
-        let grandTotal = 0;
+function render() {
+    let cont = document.getElementById('daftarJendela'), grand = 0;
+    cont.innerHTML = list.map(w => {
+        let res = hitung(w); grand += res.total;
+        let secureData = encodeURIComponent(JSON.stringify({ nama: w.nama, items: res.items, total: res.total }));
+        return `<div class="window-card"><strong>${w.nama}</strong>: Rp ${Math.round(res.total).toLocaleString()} <button onclick="bukaModal('${secureData}')">Detail</button><button onclick="list=list.filter(x=>x.id!=${w.id});render()">Hapus</button></div>`;
+    }).join('');
+    document.getElementById('totalSemua').innerText = "Total Semua: Rp " + Math.round(grand).toLocaleString();
+}
 
-        for (let i = 0; i < rows.length; i++) {
-            const totalRow = parseFloat(rows[i].querySelector('.total-harga').value) || 0;
-            grandTotal += totalRow;
-        }
+function lanjutKeInvoice() {
+    let dataInvoice = list.map(w => ({ namaItem: w.nama, totalHarga: hitung(w).total }));
+    let grandTotal = dataInvoice.reduce((sum, item) => sum + item.totalHarga, 0);
+    localStorage.setItem('invoiceItems', JSON.stringify(dataInvoice));
+    localStorage.setItem('invoiceGrandTotal', grandTotal);
+    window.location.href = 'invoice.html';
+}
 
-        document.getElementById('grand-total-text').innerText = grandTotal.toLocaleString('id-ID');
-    }
+function bukaModal(encodedData) {
+    const data = JSON.parse(decodeURIComponent(encodedData));
+    document.getElementById('modalTitle').innerText = "Rincian: " + data.nama;
+    let bodyHtml = data.items.map(item => `<div class="detail-row"><div><div style="font-weight:bold;">${item.nama}</div><div style="font-size:0.8rem;color:#aaa;">Qty: ${item.qty}</div></div><div style="font-weight:bold;color:var(--accent);">Rp ${Math.round(item.harga).toLocaleString()}</div></div>`).join('');
+    bodyHtml += `<div class="detail-row" style="border-top:2px solid var(--accent);margin-top:10px;padding-top:12px;font-size:1.1rem;"><strong>TOTAL AKHIR</strong><strong style="color:#4af2a1;">Rp ${Math.round(data.total).toLocaleString()}</strong></div>`;
+    document.getElementById('modalBody').innerHTML = bodyHtml;
+    document.getElementById('customModal').classList.add('active');
+}
 
-    function lanjutKeInvoice() {
-        const tableRows = document.getElementById("calc-table").getElementsByTagName("tbody")[0].rows;
-        let items = [];
-
-        // Loop data untuk mengecek apakah kasir menginput data item baru
-        for (let i = 0; i < tableRows.length; i++) {
-            const namaItem = tableRows[i].querySelector(".nama-item").value || "";
-            const totalHarga = parseFloat(tableRows[i].querySelector(".total-harga").value) || 0;
-
-            // Hanya masukkan item yang terisi nama dan harganya
-            if (namaItem.trim() !== "" && totalHarga > 0) {
-                items.push({ namaItem: namaItem, totalHarga: totalHarga });
-            }
-        }
-
-        if (items.length > 0) {
-            // Jika ada data terisi, oper ke invoice via localStorage
-            localStorage.setItem("invoiceItems", JSON.stringify(items));
-        } else {
-            // Jika kosong (kasir langsung klik lanjut), bersihkan sisa cache lama agar layar invoice bersih
-            localStorage.removeItem("invoiceItems");
-        }
-
-        // Alihkan halaman ke screen invoice utama (Kasir tinggal Scan QR nota lama di sana)
-        window.location.href = "invoice.html";
-    }
+function tutupModal() { document.getElementById('customModal').classList.remove('active'); }
+function tutupModalLuar(e) { if (e.target.id === 'customModal') tutupModal(); }
 </script>
 
 </body>
