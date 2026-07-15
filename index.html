@@ -125,7 +125,6 @@
 let list = []; let mode = 'curtain'; let vOn = false;
 const h = { jahit: 20000, smokring: 4500, rollet: 65000, rell: 50000, hook: 40000, tali: 50000, stick: 50000, instalasi: 50000 };
 
-// Load cache cadangan lokal jika aplikasi tidak sengaja ter-refresh saat offline
 window.addEventListener('DOMContentLoaded', () => {
     const savedList = localStorage.getItem('temp_calc_list');
     if(savedList) {
@@ -174,7 +173,7 @@ function tambah() {
         Object.assign(obj, { h: +document.getElementById('bHarga').value, L: +document.getElementById('bL').value, T: +document.getElementById('bT').value });
     }
     list.push(obj); 
-    localStorage.setItem('temp_calc_list', JSON.stringify(list)); // Simpan ketahanan lokal
+    localStorage.setItem('temp_calc_list', JSON.stringify(list));
     render();
 }
 
@@ -195,8 +194,9 @@ function hitung(w) {
             items.push({nama: (w.model === 'plisket' ? "Rell" : "Rollet"), qty: Lc+"m", harga: Lc * (w.model === 'plisket' ? h.rell : h.rollet)}, {nama: "Hook", qty: "1 set", harga: h.hook}, {nama: "Tali", qty: "1 set", harga: h.tali});
         } else if(w.model === 'spiral') { items.push({nama: "Stick", qty: "1pcs", harga: h.stick}); }
         
+        // --- LOGIKA PERBAIKAN VITRASE TAMBAHAN KUNCI RUMUS MURNI (L+0.2)*3 ---
         if(w.vOn) {
-            let mKvit = (w.vModel === 'spiral') ? (w.vL * w.vQ) : mK;
+            let mKvit = (w.vModel === 'spiral') ? (w.vL * w.vQ) : (w.L + 0.2) * 3;
             items.push({nama: "Vitrase", qty: mKvit.toFixed(2)+"m", harga: mKvit * w.hVit}, {nama: "Jahit Vitrase", qty: mKvit.toFixed(2)+"m", harga: mKvit * h.jahit}, {nama: "Rell", qty: Lc+"m", harga: Lc * h.rell});
         }
         items.push({nama: "Instalasi", qty: Lc+"m", harga: Lc * h.instalasi});
@@ -254,14 +254,11 @@ function tutupModal() { document.getElementById('customModal').classList.remove(
 function tutupModalLuar(event) { if (event.target.id === 'customModal') tutupModal(); }
 </script>
 
-<!-- TOMBOL UPDATE: BISA DIKLIK LANGSUNG WALAUPUN DATA KOSONG & AMAN DIJALANKAN OFFLINE -->
 <button onclick="lanjutKeInvoice()" style="background:#28a745; color: white; width:100%; padding:15px; margin-top:20px; font-size:18px; cursor:pointer; border: none; border-radius: 6px; font-weight: bold;">LANJUT KE INVOICE</button>
 
 <script>
 function lanjutKeInvoice() {
     let dataInvoice = [];
-    
-    // Jika ada item kalkulasi, konversi data ke format nota
     if (list.length > 0) {
         dataInvoice = list.map(w => {
             let hasilHitung = hitung(w);
@@ -270,14 +267,9 @@ function lanjutKeInvoice() {
                 totalHarga: hasilHitung.total
             };
         });
-        // Bersihkan cache temporer kalkulator karena data sudah siap dipindah ke invoice
         localStorage.removeItem('temp_calc_list');
     }
-
-    // Tetap simpan ke LocalStorage (kosong ataupun ada isi akan dibaca dengan aman secara offline oleh invoice.html)
     localStorage.setItem('invoiceItems', JSON.stringify(dataInvoice));
-    
-    // Alihkan langsung ke halaman utama invoice
     window.location.href = 'invoice.html';
 }
 </script>
