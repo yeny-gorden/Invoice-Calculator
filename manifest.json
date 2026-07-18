@@ -1,23 +1,18 @@
 {
-  "name": "Yeny Gorden System",
-  "short_name": "YenyGorden",
+  "name": "Yeny Gorden Kalkulator",
+  "short_name": "YG-Calculator",
+  "description": "Aplikasi menghitung harga gorden dan cetak invoice",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#9a3412",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "logo.png",
+      "src": "icon.png",
       "sizes": "512x512",
-      "type": "image/png"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Scanner Nota",
-      "short_name": "Scanner",
-      "url": "./invoice.html",
-      "icons": [{ "src": "logo.png", "sizes": "512x512" }]
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

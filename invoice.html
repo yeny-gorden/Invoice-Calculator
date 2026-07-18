@@ -3,1064 +3,1403 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice Resmi - Yeny Gorden</title>
-    
-    <!-- Link PWA & Icon -->
-    <link rel="manifest" href="./manifest.json">
-    <link rel="icon" type="image/png" href="./logo.png">
-    <link rel="apple-touch-icon" href="./logo.png">
-    <meta name="theme-color" content="#9a3412">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <title>Sistem Dokumen Transaksi - YENY GORDEN</title>
     <style>
-        :root {
-            --primary: #0f172a;       
-            --accent: #9a3412;        
-            --success: #166534;       
-            --text-main: #1e293b;     
-            --bg-light: #f8fafc;
-            --border: #94a3b8;        
+        *, *::before, *::after {
+            box-sizing: border-box;
         }
-        
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 40px 20px;
-            background-color: #cbd5e1;
-            color: var(--text-main);
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
+            padding: 20px;
+            background-color: #f4f6f9;
+            color: #2c3e50;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
-
-        /* --- STYLE CUSTOM ALERT MODAL --- */
-        #custom-alert-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
-            z-index: 10000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-        .alert-box {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
-            text-align: center;
-            border-top: 6px solid var(--accent);
-            animation: slideIn 0.25s ease-out;
-        }
-        @keyframes slideIn {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .alert-box h3 { margin: 0 0 12px 0; color: var(--primary); font-weight: 800; font-size: 18px; }
-        .alert-box p { color: #475569; font-size: 15px; margin: 0 0 25px 0; font-weight: 500; line-height: 1.5; }
-        .alert-buttons { display: flex; justify-content: center; gap: 10px; }
-        .alert-btn-ok { background: var(--accent); color: white; border: none; padding: 10px 24px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; }
-        .alert-btn-cancel { background: #e2e8f0; color: var(--primary); border: none; padding: 10px 24px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; }
-        
-        #alert-prompt-input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 2px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 15px;
-            text-align: center;
-            font-weight: 600;
-            box-sizing: border-box;
-            display: none;
-        }
-        #alert-prompt-input:focus { border-color: var(--accent); outline: none; }
-
-        /* --- STYLE SYSTEM LOGIN --- */
-        #login-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #0f172a;
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .login-box {
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 360px;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
-            text-align: center;
-        }
-        .login-box h2 { margin: 0 0 10px 0; color: var(--primary); font-weight: 800; }
-        .login-box p { color: #64748b; font-size: 14px; margin: 0 0 25px 0; }
-        .login-box input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 2px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            box-sizing: border-box;
-            text-align: center;
-        }
-        .login-box input:focus { border-color: var(--accent); outline: none; }
-        .login-box button {
-            width: 100%;
-            padding: 12px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .invoice-container {
-            max-width: 850px;
+        .container {
+            max-width: 900px;
             margin: 0 auto;
             background: #ffffff;
-            padding: 50px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            position: relative; 
-            overflow: hidden;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-
-        .stamp-lunas {
-            position: absolute;
-            top: 45%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-15deg);
-            border: 6px double #dc2626;
-            color: #dc2626;
-            font-size: 100px;
-            font-weight: 900;
-            padding: 10px 40px;
-            border-radius: 15px;
-            opacity: 0.18; 
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            pointer-events: none;
-            display: none; 
-            z-index: 99;
-        }
-
-        .invoice-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 3px solid var(--primary);
-            padding-bottom: 30px;
-            margin-bottom: 35px;
-        }
-
-        .brand-section h1 { margin: 0; font-size: 36px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; text-transform: uppercase; }
-        .brand-section p { margin: 4px 0 0 0; font-size: 14px; color: #334155; font-weight: 500; }
-        .nib-text { color: #334155 !important; font-weight: 700 !important; }
-
-        .invoice-meta-title h2 { margin: 0 0 10px 0; font-size: 30px; font-weight: 800; color: var(--accent); letter-spacing: 1px; }
-        .meta-inputs { font-weight: 700; color: var(--primary); }
-        .meta-inputs div { margin-bottom: 5px; }
-        .meta-inputs input { border: 1px solid transparent; text-align: right; font-size: 15px; padding: 4px; width: 190px; font-weight: 700; color: var(--primary); background: transparent; }
-        .meta-inputs input:focus { border-color: var(--border); background: var(--bg-light); outline: none; }
-
-        .details-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; margin-bottom: 40px; }
-        .info-card { background: var(--bg-light); padding: 20px; border-radius: 8px; border: 2px solid var(--border); }
-        .info-card h3 { margin: 0 0 12px 0; font-size: 13px; text-transform: uppercase; color: var(--accent); font-weight: 800; letter-spacing: 0.5px; }
-        
-        .info-card input, .info-card textarea { 
-            width: 100%; 
-            background: transparent; 
-            border: 1px solid transparent; 
-            padding: 6px 0; 
-            font-size: 15px; 
-            color: var(--primary); 
-            font-weight: 600;
-        }
-        .info-card input::placeholder, .info-card textarea::placeholder { color: #64748b; font-weight: 400; }
-        .info-card input:focus, .info-card textarea:focus { border-bottom: 2px solid var(--primary); outline: none; background: #fff; }
-
-        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; border: 2px solid var(--primary); }
-        th { background-color: var(--primary); color: #ffffff; padding: 14px 16px; font-size: 14px; font-weight: 700; text-transform: uppercase; }
-        td { padding: 14px 16px; border-bottom: 2px solid #e2e8f0; }
-        td input { width: 100%; border: 1px solid transparent; padding: 6px; font-size: 15px; font-weight: 600; color: var(--primary); background: transparent; }
-        td input:focus { background: var(--bg-light); border-color: var(--border); outline: none; }
-        .align-right input { text-align: right; font-weight: 700; }
-
-        .table-actions-row { display: flex; justify-content: flex-start; margin-bottom: 25px; }
-
-        .invoice-summary-section { display: flex; justify-content: flex-end; margin-top: 20px; }
-        .summary-box { width: 360px; border: 2px solid var(--border); padding: 15px; border-radius: 8px; background: var(--bg-light); }
-        .summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 15px; align-items: center; font-weight: 700; color: var(--primary); }
-        .summary-row input { text-align: right; border: 1px solid transparent; font-size: 15px; width: 150px; font-weight: 800; color: var(--primary); background: transparent; }
-        .summary-row input:focus { background: #fff; border-color: var(--border); outline: none; }
-        .grand-total-row { border-top: 3px solid var(--primary); margin-top: 8px; padding-top: 14px; font-size: 18px; font-weight: 800; }
-
-        .invoice-footer { margin-top: 60px; display: flex; justify-content: space-between; align-items: center; border-top: 2px dashed var(--border); padding-top: 30px; position: relative; }
-        .terms { font-size: 13px; color: #1e293b; max-width: 420px; font-weight: 500; line-height: 1.5; }
-        .signature-qr-wrap { display: flex; flex-direction: column; align-items: center; text-align: center; }
-
-        #qrcode { display: block; width: 150px; height: 150px; }
-
-        .thanks-note {
+        .header {
             text-align: center;
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--accent);
-            font-style: italic;
-            margin-top: 40px;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 15px;
-            letter-spacing: 0.3px;
+            border-bottom: 3px double #2c3e50;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
         }
-
-        #scanner-area {
-            max-width: 850px;
-            margin: 0 auto 20px auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            border: 3px dashed var(--accent);
-            display: none;
+        .header h1 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 26px;
+            letter-spacing: 1px;
+            font-weight: bold;
         }
-
-        .action-bar { max-width: 850px; margin: 25px auto 0 auto; display: flex; justify-content: space-between; gap: 10px; align-items: center; }
-        .action-left { display: flex; gap: 5px; align-items: center; }
-        .action-right { display: flex; gap: 10px; align-items: center; }
-        .btn { padding: 12px 24px; font-size: 15px; font-weight: 700; border-radius: 6px; cursor: pointer; border: none; transition: 0.2s; white-space: nowrap; }
-        .btn-add { background-color: #e2e8f0; color: var(--primary); border: 2px solid var(--border); padding: 8px 16px; font-size: 14px; }
-        .btn-print { background-color: var(--accent); color: #fff; }
-        .btn-scan { background-color: var(--primary); color: #fff; }
-        .btn-delete { background: transparent; color: #dc2626; font-size: 13px; font-weight: 700; }
-        .btn:hover { opacity: 0.9; }
-
-        #status-badge {
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 50px;
+        .header p {
+            margin: 5px 0 0 0;
             font-size: 13px;
-            font-weight: 800;
-            background-color: #fef3c7;
-            color: #b45309;
-            margin-top: 5px;
-            border: 1px solid #f59e0b;
+            color: #333;
+            font-weight: normal;
         }
-
-        #active-cashier-info {
-            font-size: 13px;
-            color: var(--primary);
-            font-weight: 700;
-            margin-top: 5px;
-            background: #e2e8f0;
-            padding: 4px 10px;
+        
+        /* Status Bar Koneksi */
+        .status-banner {
+            padding: 8px 15px;
             border-radius: 4px;
-            display: inline-block;
+            margin-bottom: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .online-status {
+            background-color: #d4efdf;
+            color: #196f3d;
+            border: 1px solid #27ae60;
+        }
+        .offline-status {
+            background-color: #fadbd8;
+            color: #78281f;
+            border: 1px solid #e74c3c;
         }
 
-        /* --- NOTIFIKASI INDIKATOR OFFLINE --- */
-        #offline-indicator {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: #dc2626;
-            color: #ffffff;
-            padding: 10px 20px;
+        .doc-selector {
+            background: #eef2f7;
+            padding: 15px;
             border-radius: 6px;
-            font-weight: 700;
+            margin-bottom: 25px;
+            display: table;
+            width: 100%;
+        }
+        .selector-cell {
+            display: table-cell;
+            vertical-align: middle;
+        }
+        .selector-cell label {
+            font-weight: bold;
+            margin-right: 10px;
+            color: #2c3e50;
+        }
+        .selector-cell select {
+            padding: 8px 12px;
             font-size: 14px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            z-index: 99999;
-            display: none;
-            animation: slideIn 0.3s ease-out;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .section-title {
+            font-size: 16px;
+            color: #2c3e50;
+            border-left: 4px solid #2c3e50;
+            padding-left: 8px;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+        .meta-grid {
+            display: table;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .meta-row {
+            display: table-row;
+        }
+        .meta-col {
+            display: table-cell;
+            width: 50%;
+            padding-right: 15px;
+            vertical-align: top;
+        }
+        .meta-col:last-child {
+            padding-right: 0;
+            padding-left: 15px;
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #2c3e50;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #333;
+            font-family: Arial, sans-serif;
+        }
+        .form-group textarea {
+            resize: vertical;
+            height: 52px;
+        }
+        
+        .input-with-btn {
+            display: flex;
+            gap: 5px;
+        }
+        .input-with-btn input {
+            flex: 1;
+        }
+        .btn-edit-manual {
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            padding: 0 10px;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+        .btn-edit-manual:hover {
+            background-color: #d35400;
         }
 
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 10px;
+            font-size: 13px;
+            text-align: left;
+            color: #333;
+        }
+        th {
+            background-color: #2c3e50;
+            color: white;
+            font-weight: bold;
+        }
+        .txt-center { text-align: center; }
+        .txt-right { text-align: right; }
+        .input-item {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #333;
+            font-family: Arial, sans-serif;
+        }
+        .btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 13px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .btn:hover {
+            background-color: #219653;
+        }
+        .btn-primary {
+            background-color: #2980b9;
+        }
+        .btn-primary:hover {
+            background-color: #2471a3;
+        }
+        .btn-danger {
+            background-color: #c0392b;
+        }
+        .btn-danger:hover {
+            background-color: #962d22;
+        }
+        .btn-secondary {
+            background-color: #7f8c8d;
+        }
+        .btn-secondary:hover {
+            background-color: #6c7a7d;
+        }
+        
+        .summary-wrapper {
+            margin-top: 20px;
+            display: table;
+            width: 100%;
+        }
+        .summary-left {
+            display: table-cell;
+            width: 55%;
+            vertical-align: top;
+            padding-right: 20px;
+        }
+        .summary-right {
+            display: table-cell;
+            width: 45%;
+            vertical-align: top;
+        }
+        
+        .summary-table {
+            width: 100%;
+            margin-top: 0;
+        }
+        .summary-table td {
+            padding: 6px 10px;
+            font-size: 13px;
+            border: 1px solid #e2e8f0;
+        }
+        .summary-table input.input-item {
+            width: 90px;
+            display: inline-block;
+            padding: 4px;
+        }
+        .summary-table .final-row {
+            background-color: #eef2f7;
+            font-weight: bold;
+        }
+        .summary-table .balance-row {
+            background-color: #d4efdf;
+            font-weight: bold;
+            color: #196f3d;
+        }
+
+        .info-note {
+            background-color: #fcf3cf;
+            border-left: 4px solid #f39c12;
+            padding: 10px;
+            font-size: 11px;
+            color: #7e5109;
+            margin-top: 15px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+        .footer-note {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+        
+        /* Area Tanda Tangan Presisi dan Sejajar */
+        .signature-area {
+            display: table;
+            width: 100%;
+            margin-top: 40px;
+            page-break-inside: avoid;
+        }
+        .signature-row {
+            display: table-row;
+        }
+        .signature-box {
+            display: table-cell;
+            width: 50%;
+            text-align: center;
+            font-size: 13px;
+            color: #333;
+            vertical-align: bottom;
+        }
+        .signature-space-wrapper {
+            display: table-cell;
+            width: 50%;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .signature-space {
+            height: 95px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 5px auto;
+        }
+        
+        /* Input Nama di bawah tanda tangan */
+        .sig-name-input {
+            width: 180px;
+            text-align: center;
+            border: none;
+            border-bottom: 1px dashed #cbd5e1;
+            padding: 4px;
+            font-weight: bold;
+            font-size: 13px;
+            outline: none;
+            color: #2c3e50;
+            background: transparent;
+        }
+        .sig-name-input:focus {
+            border-bottom: 1px solid #2c3e50;
+        }
+        
+        /* Canvas Tanda Tangan Konsumen */
+        .sig-canvas-container {
+            position: relative;
+            width: 220px;
+            height: 90px;
+            background-color: #f8f9fa;
+            border: 1px dashed #cbd5e1;
+            border-radius: 6px;
+        }
+        .sig-canvas {
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            touch-action: none;
+        }
+        .btn-clear-sig {
+            position: absolute;
+            bottom: 3px;
+            right: 3px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: bold;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .no-print-btn {
+            margin-top: 25px;
+            text-align: center;
+            border-top: 2px dashed #ddd;
+            padding-top: 20px;
+        }
+        .btn-print {
+            background-color: #2c3e50;
+            padding: 12px 25px;
+            font-size: 15px;
+        }
+        .btn-print:hover {
+            background-color: #1a252f;
+        }
+        .history-section {
+            margin-top: 40px;
+            background: #fdfefe;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #d6dbdf;
+        }
+        .search-box-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #2c3e50;
+            border-radius: 4px;
+            font-size: 14px;
+            padding-right: 40px;
+        }
+        .search-loader {
+            display: none;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: #2980b9;
+        }
+
+        @keyframes modalFadeIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
         @media print {
-            body { background: #fff; padding: 0; }
-            .invoice-container { box-shadow: none; padding: 0; width: 100%; }
-            .action-bar, #scanner-area, .btn-delete, .th-action, .td-action, #login-screen, .table-actions-row, #custom-alert-overlay, #floating-payment-modal, #offline-indicator { display: none !important; }
-            input, textarea { border: none !important; background: transparent !important; pointer-events: none; color: #000 !important; }
-            .info-card { border: 2px solid #000; }
-            table { border: 2px solid #000; }
-            th { background-color: #000 !important; color: #fff !important; }
-            td { border-bottom: 1px solid #000; }
-            .summary-box { border: 2px solid #000; }
-            .stamp-lunas { opacity: 0.25 !important; } 
-            #qrcode-container {
-                border: 2px solid #000000 !important;
-                background: #ffffff !important;
+            body {
+                background-color: #fff;
+                padding: 0;
+                color: #000;
             }
-            #qrcode img { display: block !important; }
+            .container {
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+            }
+            .doc-selector, .no-print-btn, .btn-action, .history-section, .btn-danger, .info-note, .summary-table input, .status-banner, .btn-edit-manual, #customAlertModal, .btn-clear-sig {
+                display: none !important;
+            }
+            .sig-canvas-container {
+                border: none !important;
+                background-color: transparent !important;
+            }
+            input, textarea, select {
+                border: none !important;
+                background: transparent !important;
+                padding: 0 !important;
+                resize: none !important;
+                outline: none !important;
+                color: #000 !important;
+                font-weight: inherit !important;
+            }
+            .sig-name-input {
+                border-bottom: none !important;
+                width: 100% !important;
+                font-size: 13px !important;
+            }
+            input[type="date"]::-webkit-calendar-picker-indicator,
+            input[type="date"]::-webkit-inner-spin-button {
+                display: none !important;
+                -webkit-appearance: none !important;
+            }
+            input[type="date"] {
+                -moz-appearance: textfield !important;
+            }
+            .input-item {
+                text-align: inherit;
+            }
+            th {
+                background-color: #2c3e50 !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                border: 1px solid #000 !important;
+            }
+            td {
+                border: 1px solid #000 !important;
+            }
+            .summary-table td {
+                border: 1px solid #000 !important;
+            }
+            .print-discount-val {
+                display: inline !important;
+            }
+        }
+        .print-discount-val {
+            display: none;
         }
     </style>
 </head>
 <body>
 
-<div id="offline-indicator">⚠️ Mode Offline: Koneksi internet terputus. Data disimpan lokal.</div>
+<div class="container">
+    <div id="connectionStatus" class="status-banner online-status">
+        🟢 Terhubung ke Server (Mode Online - Sinkronisasi Aktif)
+    </div>
 
-<div id="custom-alert-overlay">
-    <div class="alert-box">
-        <h3 id="alert-title">Notifikasi</h3>
-        <p id="alert-message">Pesan teks di sini...</p>
-        <input type="text" id="alert-prompt-input">
-        <div class="alert-buttons">
-            <button id="alert-btn-cancel" class="alert-btn-cancel" onclick="closeCustomAlert(false)">Batal</button>
-            <button id="alert-btn-ok" class="alert-btn-ok" onclick="closeCustomAlert(true)">Oke</button>
+    <div class="header">
+        <h1>YENY GORDEN</h1>
+        <p>Jl. Jend. Sudirman Berkoh - Purwokerto 53146</p>
+        <p>Tlp: 089504215020 | Email: yenygorden@gmail.com</p>
+        <p><strong>NIB: 3006260016473</strong></p>
+    </div>
+
+    <div class="doc-selector">
+        <div class="selector-cell">
+            <label for="documentType">STATUS DOKUMEN SAAT INI:</label>
+            <select id="documentType" onchange="updateDocType(true)">
+                <option value="ESTIMATE">ESTIMATE (Perkiraan Biaya Awal)</option>
+                <option value="QUOTATION">QUOTATION (Surat Penawaran Harga)</option>
+                <option value="INVOICE">INVOICE (Faktur / Tagihan Akhir)</option>
+            </select>
         </div>
     </div>
-</div>
 
-<div id="login-screen">
-    <div class="login-box" id="box-auth">
-        <h2>KASIR LOGIN</h2>
-        <p>Yeny Gorden Billing System</p>
-        <input type="text" id="login-id" placeholder="ID / Nama Kasir">
-        <input type="password" id="login-pin" placeholder="Masukkan PIN" pattern="[0-9]*" inputmode="numeric">
-        <button onclick="prosesLogin()">Masuk Aplikasi</button>
-    </div>
-
-    <div class="login-box" id="box-ganti-pin" style="display: none;">
-        <h2>GANTI PIN AMAN</h2>
-        <p>Demi privasi, wajib ganti PIN bawaan Anda sekarang.</p>
-        <input type="password" id="pin-baru-1" placeholder="Masukkan PIN Baru" pattern="[0-9]*" inputmode="numeric">
-        <input type="password" id="pin-baru-2" placeholder="Ulangi PIN Baru" pattern="[0-9]*" inputmode="numeric">
-        <button onclick="prosesGantiPIN()">Simpan & Amankan</button>
-    </div>
-</div>
-
-<div id="scanner-area">
-    <h3 style="margin-top: 0; color: var(--accent); font-weight: 800;">Kamera Scanner Yeny Gorden</h3>
-    <p style="font-size: 14px; color: #334155; font-weight: 500;">Arahkan kamera ke QR Code nota pelanggan untuk pelunasan termin.</p>
-    <div id="reader" style="width: 100%; max-width: 400px; margin: 0 auto;"></div>
-    <button class="btn btn-delete" style="display: block; margin: 10px auto 0 auto;" onclick="toggleScanner()">Tutup Kamera</button>
-</div>
-
-<div class="invoice-container">
-    <div id="stamp" class="stamp-lunas">LUNAS</div>
-
-    <div class="invoice-header">
-        <div class="brand-section">
-            <h1>YENY GORDEN</h1>
-            <p style="font-style: italic; font-weight: 600; color: var(--accent); margin-bottom: 6px; font-size: 18px;">custom blinds & curtain</p>
-            <p>JL. Jend. Sudirman Berkoh - Purwokerto 53146</p>
-            <p>Tlp. 089504215020 | Email: yenygorden@gmail.com</p>
-            <p class="nib-text">NIB: 3006260016473</p>
-        </div>
-        <div class="invoice-title-block">
-            <div class="invoice-meta-title">
-                <h2 id="invoice-title">INVOICE</h2>
-                <div class="meta-inputs">
-                    <div>No Nota: <input type="text" id="nota-num" value="" oninput="updateQRCode()"></div>
-                    <div>Tanggal: <input type="date" id="date-picker"></div>
+    <div class="meta-grid">
+        <div class="meta-row">
+            <div class="meta-col">
+                <div class="section-title">Detail Dokumen</div>
+                <div class="form-group">
+                    <label id="lblDocNo">No. Estimate</label>
+                    <div class="input-with-btn">
+                        <input type="text" id="docNo" value="" placeholder="Otomatis dibuat..." readonly style="font-weight: bold;">
+                        <button type="button" class="btn-edit-manual" onclick="bukaKunciManual()">✏️ Ubah</button>
+                    </div>
                 </div>
-                <div id="status-badge">STATUS: BARU (DRAFT)</div>
-                <br>
-                <div id="active-cashier-info">Kasir: <span id="txt-nama-kasir">-</span></div>
+                <div class="form-group">
+                    <label>Tanggal</label>
+                    <input type="date" id="docDate">
+                </div>
+                <div class="form-group" id="paymentTermGroup" style="display:none;">
+                    <label>Jatuh Tempo / Metode Pembayaran</label>
+                    <input type="text" id="paymentTerm" value="Tunai / Transfer Bank">
+                </div>
+            </div>
+            <div class="meta-col">
+                <div class="section-title">Kepada Yth.</div>
+                <div class="form-group">
+                    <label>Nama Pelanggan</label>
+                    <input type="text" id="clientName" placeholder="Nama Pelanggan" oninput="sinkronNamaPelanggan()">
+                </div>
+                <div class="form-group">
+                    <label>Alamat / No. Tlp</label>
+                    <textarea id="clientInfo" placeholder="Alamat lengkap dan nomor telepon pelanggan"></textarea>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="details-grid">
-        <div class="info-card">
-            <h3>Diterbitkan Kepada:</h3>
-            <input type="text" id="client-name" placeholder="Nama Pelanggan" style="font-weight: 700; font-size: 16px;">
-            <textarea id="client-address" rows="2" placeholder="Alamat lengkap pemasangan"></textarea>
-            <input type="text" id="client-phone" placeholder="No. HP / WhatsApp">
-        </div>
-        <div class="info-card">
-            <h3>Detail & Spesifikasi Proyek:</h3>
-            <textarea id="project-details" rows="4" placeholder="Catatan Model Gorden & Kain"></textarea>
-        </div>
-    </div>
-
-    <table id="invoice-table">
+    <div class="section-title">Rincian Per Jendela / Ruangan</div>
+    <table id="itemsTable">
         <thead>
             <tr>
-                <th style="width: 45%; text-align: left;">Deskripsi Pesanan</th>
-                <th style="width: 10%; text-align: right;">Jumlah</th>
-                <th style="width: 20%; text-align: right;">Harga Satuan (Rp)</th>
-                <th style="width: 20%; text-align: right;">Total (Rp)</th>
-                <th class="th-action" style="width: 5%;"></th>
+                <th width="5%" class="txt-center">No</th>
+                <th width="50%">Lokasi Jendela / Ruangan (Keterangan Set Gorden)</th>
+                <th width="15%" class="txt-center">Jumlah Set (Qty)</th>
+                <th width="25%" class="txt-center">Total Harga Per Jendela (Rp)</th>
+                <th width="5%" class="txt-center btn-action">Aksi</th>
             </tr>
         </thead>
-        <tbody>
-            <!-- Data item gorden masuk disini -->
+        <tbody id="tableBody">
+            <tr>
+                <td class="txt-center">1</td>
+                <td><input type="text" class="input-item" placeholder="Contoh: Ruang Tamu - Jendela Utama (Kain+Rel+Vitrase)"></td>
+                <td><input type="number" class="input-item txt-center qty" value="1" oninput="calculateTotal()"></td>
+                <td><input type="number" class="input-item txt-right row-total-input" value="0" oninput="calculateTotal()"></td>
+                <td class="txt-center btn-action"><button class="btn btn-danger" onclick="deleteRow(this)">X</button></td>
+            </tr>
         </tbody>
     </table>
 
-    <div class="table-actions-row">
-        <button class="btn btn-add" onclick="addNewRow()">+ Tambah Baris</button>
+    <div class="btn-action">
+        <button class="btn" onclick="addRow()">+ Tambah Jendela / Ruangan</button>
     </div>
 
-    <div class="invoice-summary-section">
-        <div class="summary-box">
-            <div class="summary-row">
-                <span>Subtotal</span>
-                <div>Rp <input type="number" id="subtotal" value="0" readonly></div>
+    <div class="summary-wrapper">
+        <div class="summary-left">
+            <div class="footer-note" style="border-top: none; padding-top: 0;">
+                <div class="form-group">
+                    <label style="font-weight: bold;">Catatan / Keterangan Tambahan:</label>
+                    <textarea id="docNotes" style="height: 90px;"></textarea>
+                </div>
             </div>
-            <div class="summary-row" style="color: #dc2626;">
-                <span>Diskon <span id="discount-label"></span></span>
-                <div>Rp <input type="number" id="discount-amount" placeholder="0" oninput="calculateTotal()"></div>
+            <div class="info-note">
+                <strong>💡 Ketentuan Input Diskon & Tanda Tangan:</strong><br>
+                • Masukkan 1-2 digit diskon untuk persentase <strong>(Contoh: 10 = 10%)</strong>.<br>
+                • Masukkan lebih dari 2 digit diskon untuk nominal rupiah langsung <strong>(Contoh: 50000 = Rp 50.000)</strong>.<br>
+                • <strong>Pelanggan:</strong> Coret layar langsung di dalam kotak abu-abu sebelah kiri.<br>
+                • <strong>Yeny Gorden:</strong> Unggah foto ttd Anda di sebelah kanan, background putih otomatis hilang!
             </div>
-            <div class="summary-row">
-                <span>PPN (%)</span>
-                <div><input type="number" id="ppn-rate" value="0" min="0" oninput="calculateTotal()" style="width: 60px;"> %</div>
-            </div>
-            <div class="summary-row">
-                <span>Ongkos Kirim</span>
-                <div>Rp <input type="number" id="shipping-cost" value="0" min="0" oninput="calculateTotal()"></div>
-            </div>
-            <div class="summary-row" style="color: var(--success);">
-                <span>Total Masuk (DP/Cicilan)</span>
-                <div>Rp <input type="number" id="dp-amount" placeholder="0" min="0" oninput="calculateTotal()"></div>
-            </div>
-            <div class="summary-row grand-total-row">
-                <span>Sisa Tagihan</span>
-                <div style="color: var(--accent);">Rp <input type="number" id="balance-due" value="0" readonly style="color: var(--accent); font-size: 18px;"></div>
-            </div>
+        </div>
+
+        <div class="summary-right">
+            <table class="summary-table">
+                <tr>
+                    <td><strong>Subtotal</strong></td>
+                    <td class="txt-right"><span id="subtotalVal">Rp 0</span></td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Diskon </strong>
+                        <span id="discountTypeLabel" style="font-size: 11px; color:#555;">(Rp/%)</span>
+                    </td>
+                    <td class="txt-right">
+                        <span class="print-discount-val" id="discountPrintVal">0</span>
+                        <input type="number" id="discountInput" class="input-item txt-right" value="0" oninput="calculateTotal()">
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Nominal Diskon</strong></td>
+                    <td class="txt-right"><span id="discountTotalVal">-Rp 0</span></td>
+                </tr>
+                <tr>
+                    <td><strong>PPN (%)</strong></td>
+                    <td class="txt-right">
+                        <input type="number" id="taxInput" class="input-item txt-right" value="0" min="0" oninput="calculateTotal()">
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Nominal PPN</strong></td>
+                    <td class="txt-right"><span id="taxTotalVal">Rp 0</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Ongkos Kirim (Rp)</strong></td>
+                    <td class="txt-right">
+                        <input type="number" id="shippingInput" class="input-item txt-right" value="0" min="0" oninput="calculateTotal()">
+                    </td>
+                </tr>
+                <tr class="final-row">
+                    <td><strong id="lblTotalFinal">Total Estimate</strong></td>
+                    <td class="txt-right"><strong id="totalFinalVal">Rp 0</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>Uang Muka / DP (Rp)</strong></td>
+                    <td class="txt-right">
+                        <input type="number" id="dpInput" class="input-item txt-right" value="0" min="0" oninput="calculateTotal()">
+                    </td>
+                </tr>
+                <tr class="balance-row">
+                    <td><strong>Sisa Tagihan</strong></td>
+                    <td class="txt-right"><strong id="balanceDueVal">Rp 0</strong></td>
+                </tr>
+            </table>
         </div>
     </div>
 
-    <div class="invoice-footer">
-        <div class="terms">
-            <p style="margin: 0 0 5px 0; font-weight: 700; color: var(--primary);">Syarat & Ketentuan:</p>
-            <p style="margin: 0;">1. Dp minimal 50% dari total tagihan.<br>2. Produk gorden dikerjakan setelah DP dikonfirmasi.<br>
-            3. Permintaan pembatalan tidak di layani ketika sudah masuk proses pengerjaan.</p>
+    <!-- AREA TANDA TANGAN SEJAJAR -->
+    <div class="signature-area">
+        <div class="signature-row">
+            <div class="signature-box" style="padding-bottom: 5px;">
+                Pelanggan,
+            </div>
+            <div class="signature-box" style="padding-bottom: 5px; line-height: 1.4;">
+                Purwokerto, <span id="currentDateTxt"></span><br>Hormat Kami, <strong>Yeny Gorden</strong>
+            </div>
         </div>
         
-        <div class="signature-qr-wrap" style="page-break-inside: avoid;">
-            <div id="qrcode-container" style="position: relative; display: inline-flex; align-items: center; justify-content: center; background: #ffffff; padding: 6px; border-radius: 8px; border: 2px solid #0f172a; width: 150px; height: 150px; box-sizing: content-box;">
-                <div id="qrcode"></div>
-                <img src="https://raw.githubusercontent.com/yeny-gorden/Invoice-Calculator/base/logo.png" style="position: absolute; width: 38px; height: 38px; border: 3px solid #ffffff; background: #ffffff; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.15); top: 50%; left: 50%; transform: translate(-50%, -50%);">
+        <div class="signature-row">
+            <div class="signature-space-wrapper">
+                <div class="signature-space">
+                    <div class="sig-canvas-container">
+                        <canvas id="customerCanvas" class="sig-canvas"></canvas>
+                        <button type="button" class="btn-clear-sig" onclick="clearCustomerCanvas()">Hapus</button>
+                    </div>
+                </div>
             </div>
-            <p style="margin-top: 10px; font-size: 13px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">Yeny Gorden</p>
+            <div class="signature-space-wrapper">
+                <div class="signature-space">
+                    <img id="sigPreview" style="display: none; max-height: 80px; max-width: 180px; object-fit: contain; z-index: 2;" alt="Tanda Tangan">
+                    <label id="uploadSigBtn" class="no-print-btn" style="
+                        position: absolute;
+                        font-size: 11px;
+                        background-color: #34495e;
+                        color: white;
+                        padding: 5px 10px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        z-index: 3;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                    ">
+                        ✍️ Unggah Foto Tanda Tangan
+                        <input type="file" id="sigInput" accept="image/*" style="display: none;" onchange="prosesTandaTangan(this)">
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="signature-row">
+            <div class="signature-box" style="padding-top: 5px;">
+                 <input type="text" id="customerNameInput" class="sig-name-input" placeholder="Nama Pelanggan"> 
+            </div>
+            <div class="signature-box" style="padding-top: 5px;">
+                 <input type="text" id="ownerNameInput" class="sig-name-input" value="Yeny Gorden" placeholder="Nama Pemilik"> 
+            </div>
         </div>
     </div>
-    
-    <div class="thanks-note">
-        "Terima Kasih Telah Mempercayakan Keindahan Hunian Anda Kepada Kami"
+
+    <div class="no-print-btn">
+        <button class="btn btn-primary" onclick="saveTransaction()">💾 Simpan Dokumen (Auto Sync)</button>
+        <button class="btn btn-secondary" onclick="resetForm()">🔄 Kosongkan Form (Pelanggan Baru)</button>
+        <br><br>
+        <button class="btn btn-print" onclick="window.print()">🖨️ Cetak / Simpan ke PDF</button>
+    </div>
+
+    <div class="history-section">
+        <div class="section-title" style="border-left-color: #2980b9; color: #2980b9;">Database & Riwayat Transaksi Toko (Sinkronisasi Cloud)</div>
+        
+        <div class="search-box-container">
+            <input type="text" id="searchInput" class="search-box" onkeyup="searchHistory()" placeholder="🔍 KETIK DI SINI: Cari otomatis berdasarkan Nama Pelanggan, No Nota, atau Alamat...">
+            <div id="searchLoader" class="search-loader">⏳ Sinkronisasi...</div>
+        </div>
+        
+        <table id="historyTable">
+            <thead>
+                <tr style="background-color: #2980b9;">
+                    <th width="18%">No. Dokumen</th>
+                    <th width="10%">Jenis</th>
+                    <th width="15%">Tanggal</th>
+                    <th width="25%">Nama Pelanggan</th>
+                    <th width="18%">Sisa Tagihan</th>
+                    <th width="14%" class="txt-center">Tindakan</th>
+                </tr>
+            </thead>
+            <tbody id="historyTableBody"></tbody>
+        </table>
     </div>
 </div>
 
-<div class="action-bar">
-    <div class="action-left">
-        <input type="text" id="search-nota" placeholder="No. Nota..." style="padding: 10px; border-radius: 4px; border: 1px solid #94a3b8; font-size: 14px;">
-        <button class="btn btn-scan" style="padding: 10px 20px;" onclick="cariNotaManual()">Cari</button>
-    </div>
-    <div class="action-right">
-        <button class="btn btn-scan" onclick="toggleScanner()">Mode Kasir: Scan QR</button>
-        <button class="btn btn-print" onclick="simpanLaluCetak()">Cetak / Simpan PDF</button>
-    </div>
-</div>
-
-<!-- --- FLOATING MENU INPUT PEMBAYARAN TERMIN --- -->
-<div id="floating-payment-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; display: none; justify-content: center; align-items: center;">
-    <div style="background: #ffffff; padding: 25px; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); border-top: 6px solid #166534;">
-        <h3 id="float-modal-title" style="margin: 0 0 5px 0; color: #0f172a; font-weight: 800; font-size: 18px;">Input Pembayaran Termin</h3>
-        <p id="float-modal-subtitle" style="margin: 0 0 15px 0; color: #64748b; font-size: 13px; font-weight: 600;">Nota: <span id="float-nota-text">-</span></p>
-        
-        <div style="margin-bottom: 12px;">
-            <label style="font-size: 13px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Sisa Tagihan Saat Ini:</label>
-            <div style="font-size: 20px; font-weight: 800; color: #9a3412;">Rp <span id="float-sisa-tagihan">0</span></div>
-        </div>
-
-        <div style="margin-bottom: 12px;">
-            <label style="font-size: 13px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Nominal Pembayaran (Rp):</label>
-            <input type="number" id="float-input-nominal" placeholder="0" style="width: 100%; padding: 10px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 16px; font-weight: 700; box-sizing: border-box;">
-        </div>
-
-        <div style="margin-bottom: 20px;">
-            <label style="font-size: 13px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Pembayaran Termin Ke-:</label>
-            <input type="number" id="float-input-termin" value="2" min="2" style="width: 100%; padding: 10px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 15px; font-weight: 700; box-sizing: border-box; text-align: center;">
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 10px;">
-            <button class="btn btn-delete" style="padding: 10px 16px;" onclick="closeFloatingPayment()">Batal</button>
-            <button class="btn" style="background: #166534; color: white; padding: 10px 20px;" onclick="prosesBayarFloating()">Simpan Pembayaran</button>
-        </div>
+<!-- MODAL ALERT KUSTOM -->
+<div id="customAlertModal" style="
+    display: none; 
+    position: fixed; 
+    z-index: 9999; 
+    left: 0; 
+    top: 0; 
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0,0,0,0.5); 
+    align-items: center; 
+    justify-content: center;
+    backdrop-filter: blur(2px);
+">
+    <div style="
+        background-color: #fff; 
+        padding: 25px; 
+        border-radius: 8px; 
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2); 
+        width: 90%; 
+        max-width: 400px; 
+        text-align: center;
+        font-family: Arial, sans-serif;
+        animation: modalFadeIn 0.3s ease;
+    ">
+        <div id="alertIcon" style="
+            width: 60px; 
+            height: 60px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin: 0 auto 15px auto; 
+            font-size: 30px;
+        "></div>
+        <h3 id="alertTitle" style="margin: 0 0 10px 0; color: #2c3e50; font-size: 18px; font-weight: bold;"></h3>
+        <p id="alertMessage" style="margin: 0 0 20px 0; color: #555; font-size: 14px; line-height: 1.5; white-space: pre-line;"></p>
+        <button onclick="closeCustomAlert()" style="
+            background-color: #2c3e50; 
+            color: white; 
+            border: none; 
+            padding: 10px 30px; 
+            font-size: 14px; 
+            font-weight: bold; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            width: 100%;
+            transition: background 0.2s;
+        " onmouseover="this.style.backgroundColor='#1a252f'" onmouseout="this.style.backgroundColor='#2c3e50'">
+            Oke, Mengerti
+        </button>
     </div>
 </div>
 
 <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbySJJFsyBrryW_FRmzuM0hsQx1kkAzzBfUiSebEPXCjytKp70l3LD3QRh__CqkIg-8/exec";
+    const WEB_APP_URL = "SALIN_URL_APPS_SCRIPT_ANDA_DI_SINI";
 
-    let namaKasirAktif = "";
-    let isLunas = false;
-    let html5QrcodeScanner;
-    let currentAlertCallback = null;
-    let dataNotaTerpilih = null; 
+    // Inisialisasi Tanggal & Waktu
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    let mm = today.getMonth() + 1;
+    let dd = today.getDate();
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+    document.getElementById('docDate').value = yyyy + '-' + mm + '-' + dd;
+    
+    const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    document.getElementById('currentDateTxt').innerText = today.getDate() + ' ' + bulanIndo[today.getMonth()] + ' ' + today.getFullYear();
 
-    function showCustomAlert(title, message, type = "alert", defaultValue = "", callback = null) {
-        document.getElementById('alert-title').innerText = title;
-        document.getElementById('alert-message').innerText = message;
-        currentAlertCallback = callback;
-
-        const promptInput = document.getElementById('alert-prompt-input');
-        const cancelBtn = document.getElementById('alert-btn-cancel');
-
-        if (type === "prompt") {
-            promptInput.style.display = "block";
-            promptInput.value = defaultValue;
-            cancelBtn.style.display = "block";
-        } else if (type === "confirm") {
-            promptInput.style.display = "none";
-            cancelBtn.style.display = "block";
-        } else {
-            promptInput.style.display = "none";
-            cancelBtn.style.display = "none";
-        }
-
-        document.getElementById('custom-alert-overlay').style.display = "flex";
-        if (type === "prompt") promptInput.focus();
-    }
-
-    function closeCustomAlert(isOk) {
-        document.getElementById('custom-alert-overlay').style.display = "none";
-        const promptValue = document.getElementById('alert-prompt-input').value;
-        if (currentAlertCallback) {
-            if (document.getElementById('alert-prompt-input').style.display === "block") {
-                currentAlertCallback(isOk ? promptValue : null);
-            } else {
-                currentAlertCallback(isOk);
-            }
-        }
-    }
-
-    function generateNotaNumber() {
-        const now = new Date();
-        return `YG-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
-    }
-
-    document.getElementById('date-picker').valueAsDate = new Date();
-    document.getElementById('nota-num').value = generateNotaNumber();
-
-    var qrcode = new QRCode(document.getElementById("qrcode"), {
-        width: 150,
-        height: 150,
-        colorDark : "#0f172a",
-        colorLight : "#ffffff",
-        correctLevel : QRCode.CorrectLevel.H
-    });
-
-    window.onload = function() {
-        const dataKalkulator = localStorage.getItem('invoiceItems');
-        const tableBody = document.getElementById('invoice-table').getElementsByTagName('tbody')[0];
-        
-        if (dataKalkulator) {
-            const items = JSON.parse(dataKalkulator);
-            tableBody.innerHTML = "";
-            items.forEach(item => {
-                const row = tableBody.insertRow();
-                row.innerHTML = `
-                    <td><input type="text" value="${item.namaItem}" placeholder="Deskripsi Pesanan"></td>
-                    <td class="align-right"><input type="number" class="qty" value="1" min="0" oninput="calculateTotal()"></td>
-                    <td class="align-right"><input type="number" class="price" value="${item.totalHarga}" min="0" oninput="calculateTotal()"></td>
-                    <td class="align-right"><input type="number" class="row-total" value="${item.totalHarga}" readonly></td>
-                    <td class="td-action"><button class="btn btn-delete" onclick="removeRow(this)">Hapus</button></td>
-                `;
-            });
-            localStorage.removeItem('invoiceItems');
-        } else {
-            tableBody.innerHTML = "";
-            addNewRow();
-        }
-        calculateTotal();
-
-        // Cek koneksi & jalankan sinkronisasi data tertunda
-        window.addEventListener('online', handleOnlineStatus);
-        window.addEventListener('offline', handleOfflineStatus);
-        if (navigator.onLine) {
-            syncPendingData();
-        } else {
-            handleOfflineStatus();
-        }
+    const notesTemplate = {
+        'ESTIMATE': "1. Angka di atas merupakan perkiraan kasar berdasarkan info awal.\n2. Biaya final akan ditentukan setelah kami melakukan survei/pengukuran langsung di lokasi.\n3. Harga kain dan aksesoris gorden tidak mengikat sebelum ada persetujuan resmi.",
+        'QUOTATION': "1. Penawaran harga ini berlaku selama 14 hari sejak tanggal diterbitkan.\n2. Harga sudah termasuk biaya survei pemasangan untuk area Purwokerto.\n3. Pembayaran DP sebesar 50% dilakukan saat penawaran ini disetujui, dan pelunasan setelah gorden terpasang.",
+        'INVOICE': "1. Harap lakukan pembayaran pelunasan sesuai total tagihan di atas.\n2. Pembayaran dapat ditransfer ke rekening resmi Yeny Gorden.\n3. Terima kasih telah mempercayakan keindahan interior Anda kepada Yeny Gorden."
     };
 
-    function handleOnlineStatus() {
-        document.getElementById('offline-indicator').style.display = 'none';
-        syncPendingData();
+    document.getElementById('docNotes').value = notesTemplate['ESTIMATE'];
+
+    let memoryDatabase = [];
+    let searchTimeout;
+
+    function tampilAlert(tipe, judul, pesan) {
+        const modal = document.getElementById('customAlertModal');
+        const iconBox = document.getElementById('alertIcon');
+        const titleBox = document.getElementById('alertTitle');
+        const messageBox = document.getElementById('alertMessage');
+        
+        titleBox.innerText = judul;
+        messageBox.innerText = pesan;
+        
+        if (tipe === 'success') {
+            iconBox.innerText = "✅";
+            iconBox.style.backgroundColor = "#e8f8f5";
+            iconBox.style.color = "#2ecc71";
+        } else if (tipe === 'warning') {
+            iconBox.innerText = "⚠️";
+            iconBox.style.backgroundColor = "#fef9e7";
+            iconBox.style.color = "#f1c40f";
+        } else {
+            iconBox.innerText = "ℹ️";
+            iconBox.style.backgroundColor = "#ebf5fb";
+            iconBox.style.color = "#3498db";
+        }
+        modal.style.display = "flex";
     }
 
-    function handleOfflineStatus() {
-        document.getElementById('offline-indicator').style.display = 'block';
+    function closeCustomAlert() {
+        document.getElementById('customAlertModal').style.display = "none";
     }
 
-    function prosesLogin() {
-        const idKasir = document.getElementById('login-id').value.trim();
-        const pinKasir = document.getElementById('login-pin').value.trim();
+    function sinkronNamaPelanggan() {
+        const inputAtas = document.getElementById('clientName').value;
+        document.getElementById('customerNameInput').value = inputAtas;
+    }
 
-        if (!idKasir || !pinKasir) { showCustomAlert("Peringatan", "ID Kasir dan PIN tidak boleh kosong!"); return; }
+    function prosesTandaTangan(input) {
+        const file = input.files[0];
+        if (!file) return;
 
-        const params = new URLSearchParams();
-        params.append('action', 'login');
-        params.append('idKasir', idKasir);
-        params.append('pin', pinKasir);
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
 
-        fetch(WEB_APP_URL, { method: "POST", body: params })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "success") {
-                namaKasirAktif = data.nama;
-                document.getElementById('txt-nama-kasir').innerText = namaKasirAktif;
+                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imgData.data;
 
-                if (data.isFirstTime) {
-                    document.getElementById('box-auth').style.display = 'none';
-                    document.getElementById('box-ganti-pin').style.display = 'block';
-                } else {
-                    document.getElementById('login-screen').style.display = 'none';
-                    showCustomAlert("Login Sukses", "Selamat bekerja, " + namaKasirAktif + "!");
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+                    if (r > 190 && g > 190 && b > 190) {
+                        data[i + 3] = 0;
+                    }
                 }
-            } else {
-                showCustomAlert("Gagal", data.message);
-            }
-        })
-        .catch(err => {
-            // Toleransi login offline demi kelancaran lokal
-            namaKasirAktif = idKasir || "Kasir Lokal";
-            document.getElementById('txt-nama-kasir').innerText = namaKasirAktif;
-            document.getElementById('login-screen').style.display = 'none';
-            showCustomAlert("Offline Login", "Masuk dengan mode lokal (tanpa internet).");
-        });
+
+                ctx.putImageData(imgData, 0, 0);
+
+                const previewImg = document.getElementById('sigPreview');
+                previewImg.src = canvas.toDataURL();
+                previewImg.style.display = 'block';
+
+                document.getElementById('uploadSigBtn').style.opacity = '0.3';
+                tampilAlert('success', 'FOTO TANDA TANGAN BERHASIL', 'Latar belakang putih kertas berhasil dihapus secara otomatis!');
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
     }
 
-    function prosesGantiPIN() {
-        const p1 = document.getElementById('pin-baru-1').value.trim();
-        const p2 = document.getElementById('pin-baru-2').value.trim();
-        const idKasir = document.getElementById('login-id').value.trim();
+    const canvas = document.getElementById('customerCanvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
 
-        if (!p1 || !p2) { showCustomAlert("Peringatan", "PIN baru wajib diisi!"); return; }
-        if (p1 !== p2) { showCustomAlert("Peringatan", "Konfirmasi PIN tidak cocok!"); return; }
-
-        const params = new URLSearchParams();
-        params.append('action', 'gantiPin');
-        params.append('idKasir', idKasir);
-        params.append('pinBaru', p1);
-
-        fetch(WEB_APP_URL, { method: "POST", body: params })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "success") {
-                showCustomAlert("Sukses", "PIN berhasil diperbarui. Selamat bekerja!", "alert", "", () => {
-                    document.getElementById('login-screen').style.display = 'none';
-                });
-            } else {
-                showCustomAlert("Gagal", data.message);
-            }
-        });
+    function setupCanvasSize() {
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        ctx.strokeStyle = "#2c3e50";
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
     }
 
-    function addNewRow() {
-        const tableBody = document.getElementById('invoice-table').getElementsByTagName('tbody')[0];
-        const row = tableBody.insertRow();
-        row.innerHTML = `
-            <td><input type="text" placeholder="Deskripsi Pesanan Baru"></td>
-            <td class="align-right"><input type="number" class="qty" value="1" min="0" oninput="calculateTotal()"></td>
-            <td class="align-right"><input type="number" class="price" value="0" min="0" oninput="calculateTotal()"></td>
-            <td class="align-right"><input type="number" class="row-total" value="0" readonly></td>
-            <td class="td-action"><button class="btn btn-delete" onclick="removeRow(this)">Hapus</button></td>
-        `;
+    function startDrawing(e) {
+        drawing = true;
+        draw(e);
     }
 
-    function removeRow(btn) {
-        btn.parentNode.parentNode.remove();
+    function stopDrawing() {
+        drawing = false;
+        ctx.beginPath();
+    }
+
+    function draw(e) {
+        if (!drawing) return;
+        const rect = canvas.getBoundingClientRect();
+        
+        let clientX = e.clientX;
+        let clientY = e.clientY;
+        if (e.touches && e.touches[0]) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        }
+
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseleave', stopDrawing);
+
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); }, { passive: false });
+    canvas.addEventListener('touchend', (e) => { e.preventDefault(); stopDrawing(); }, { passive: false });
+    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); }, { passive: false });
+
+    function clearCustomerCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        setupCanvasSize();
+    }
+
+    function isOnline() { return navigator.onLine; }
+
+    function updateConnectionStatus() {
+        const banner = document.getElementById('connectionStatus');
+        if (isOnline()) {
+            banner.className = "status-banner online-status";
+            banner.innerText = "🟢 Terhubung ke Server (Mode Online - Sinkronisasi Aktif)";
+            syncOfflineData();
+        } else {
+            banner.className = "status-banner offline-status";
+            banner.innerText = "🔴 Koneksi Terputus (Mode Offline - Data disimpan lokal)";
+        }
+    }
+
+    window.addEventListener('online', updateConnectionStatus);
+    window.addEventListener('offline', updateConnectionStatus);
+
+    function generateAutoDocNo(type) {
+        const prefix = type === 'ESTIMATE' ? 'EST' : (type === 'QUOTATION' ? 'QTO' : 'INV');
+        const timestamp = new Date().getTime().toString().slice(-6);
+        const randomNum = Math.floor(Math.random() * 90 + 10);
+        return `${prefix}/${yyyy}/${timestamp}${randomNum}`;
+    }
+
+    function updateDocType(isUserChanged = false) {
+        const docType = document.getElementById('documentType').value;
+        const lblDocNo = document.getElementById('lblDocNo');
+        const docNoField = document.getElementById('docNo');
+        const paymentTermGroup = document.getElementById('paymentTermGroup');
+        const lblTotalFinal = document.getElementById('lblTotalFinal');
+        const docNotes = document.getElementById('docNotes');
+
+        if (isUserChanged || !docNoField.value) {
+            docNoField.value = generateAutoDocNo(docType);
+            docNoField.readOnly = true; 
+            docNoField.style.backgroundColor = ""; 
+            docNoField.style.border = "";
+        }
+
+        if (docType === 'ESTIMATE') {
+            lblDocNo.innerText = "No. Estimate";
+            paymentTermGroup.style.display = "none";
+            lblTotalFinal.innerText = "Total Estimate";
+        } else if (docType === 'QUOTATION') {
+            lblDocNo.innerText = "No. Quotation";
+            paymentTermGroup.style.display = "none";
+            lblTotalFinal.innerText = "Total Penawaran";
+        } else if (docType === 'INVOICE') {
+            lblDocNo.innerText = "No. Invoice / Faktur";
+            paymentTermGroup.style.display = "block";
+            lblTotalFinal.innerText = "Total Tagihan";
+        }
+        
+        if (isUserChanged) { docNotes.value = notesTemplate[docType]; }
         calculateTotal();
+    }
+
+    function bukaKunciManual() {
+        const docNoField = document.getElementById('docNo');
+        docNoField.removeAttribute('readonly');
+        docNoField.style.backgroundColor = '#fff9d6';
+        docNoField.style.border = '2px solid #f39c12';
+        docNoField.focus();
+        tampilAlert('info', 'MODE EDIT AKTIF', '🔓 Kolom Nomor Dokumen sekarang sudah terbuka.\nSilakan hapus dan ketik nomor nota lama yang Anda inginkan.');
+    }
+
+    function addRow() {
+        const tableBody = document.getElementById('tableBody');
+        const rowCount = tableBody.rows.length + 1;
+        const newRow = document.createElement('tr');
+        
+        newRow.innerHTML = `
+            <td class="txt-center">${rowCount}</td>
+            <td><input type="text" class="input-item" placeholder="Nama lokasi jendela / ruangan..."></td>
+            <td><input type="number" class="input-item txt-center qty" value="1" oninput="calculateTotal()"></td>
+            <td><input type="number" class="input-item txt-right row-total-input" value="0" oninput="calculateTotal()"></td>
+            <td class="txt-center btn-action"><button class="btn btn-danger" onclick="deleteRow(this)">X</button></td>
+        `;
+        tableBody.appendChild(newRow);
+        calculateTotal();
+    }
+
+    function deleteRow(button) {
+        const row = button.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+        reindexRows();
+        calculateTotal();
+    }
+
+    function reindexRows() {
+        const rows = document.querySelectorAll('#tableBody tr');
+        rows.forEach((row, index) => { row.cells[0].innerText = index + 1; });
+    }
+
+    function formatRupiah(angka) {
+        const parsed = parseFloat(angka);
+        if (isNaN(parsed)) return "Rp 0";
+        return "Rp " + new Intl.NumberFormat('id-ID').format(parsed);
     }
 
     function calculateTotal() {
-        const rows = document.getElementById('invoice-table').getElementsByTagName('tbody')[0].rows;
+        const rows = document.querySelectorAll('#tableBody tr');
         let subtotal = 0;
-        for (let i = 0; i < rows.length; i++) {
-            const qty = parseFloat(rows[i].querySelector('.qty').value) || 0;
-            const price = parseFloat(rows[i].querySelector('.price').value) || 0;
-            const totalRow = qty * price;
-            rows[i].querySelector('.row-total').value = totalRow;
-            subtotal += totalRow;
-        }
-        document.getElementById('subtotal').value = subtotal;
         
-        const discountInput = document.getElementById('discount-amount').value.toString();
-        let discountCalculated = 0;
-        const discountLabel = document.getElementById('discount-label');
-
-        if (discountInput) {
-            if (discountInput.includes('%') || discountInput.length <= 2) {
-                const pct = parseFloat(discountInput) || 0;
-                discountCalculated = (pct / 100) * subtotal;
-                discountLabel.innerText = `(${pct}%)`;
+        rows.forEach(row => {
+            const qty = parseFloat(row.querySelector('.qty').value) || 0;
+            const price = parseFloat(row.querySelector('.row-total-input').value) || 0;
+            subtotal += (qty * price);
+        });
+        
+        const rawDiscount = parseFloat(document.getElementById('discountInput').value) || 0;
+        const safeDiscount = isNaN(rawDiscount) ? 0 : rawDiscount;
+        let discountNominal = 0;
+        
+        if (safeDiscount > 0) {
+            if (safeDiscount <= 99) {
+                discountNominal = subtotal * (safeDiscount / 100);
+                document.getElementById('discountTypeLabel').innerText = "(" + safeDiscount + "%)";
+                document.getElementById('discountPrintVal').innerText = safeDiscount + "%";
             } else {
-                discountCalculated = parseFloat(discountInput) || 0;
-                discountLabel.innerText = "";
+                discountNominal = safeDiscount;
+                document.getElementById('discountTypeLabel').innerText = "(Nominal)";
+                document.getElementById('discountPrintVal').innerText = formatRupiah(safeDiscount);
             }
         } else {
-            discountLabel.innerText = "";
+            document.getElementById('discountTypeLabel').innerText = "(Rp/%)";
+            document.getElementById('discountPrintVal').innerText = "0";
         }
-
-        const ppnRate = parseFloat(document.getElementById('ppn-rate').value) || 0;
-        const shippingCost = parseFloat(document.getElementById('shipping-cost').value) || 0;
         
-        const totalAfterDiscount = subtotal - discountCalculated;
-        const ppnAmount = (ppnRate / 100) * totalAfterDiscount;
-        
-        const grandTotal = totalAfterDiscount + ppnAmount + shippingCost;
-        const dp = parseFloat(document.getElementById('dp-amount').value) || 0;
-        
-        let sisaAkhir = grandTotal - dp;
-        if (sisaAkhir < 0) sisaAkhir = 0;
-        document.getElementById('balance-due').value = sisaAkhir;
+        if (discountNominal > subtotal) discountNominal = subtotal;
 
-        // --- UPDATE TULISAN JUDUL BESAR (INVOICE / ESTIMASI) ---
-        const invoiceTitle = document.getElementById('invoice-title');
-        if (dp === 0) {
-            invoiceTitle.innerText = "ESTIMASI";
-        } else {
-            invoiceTitle.innerText = "INVOICE";
-        }
-
-        // --- STATUS BADGE ---
-        const badge = document.getElementById('status-badge');
-        if (sisaAkhir <= 0 && subtotal > 0) {
-            isLunas = true;
-            document.getElementById('stamp').style.display = 'block';
-            badge.innerText = "STATUS: LUNAS";
-            badge.style.cssText = "background-color: #dcfce7; color: var(--success); border-color: #22c55e;";
-        } else {
-            isLunas = false;
-            document.getElementById('stamp').style.display = 'none';
-            if (dp > 0) {
-                badge.innerText = "STATUS: BELUM LUNAS (DP)";
-                badge.style.cssText = "background-color: #fef3c7; color: #b45309; border-color: #f59e0b;";
-            } else {
-                badge.innerText = "STATUS: BARU (DRAFT)";
-                badge.style.cssText = "background-color: #f1f5f9; color: #475569; border-color: #94a3b8;";
-            }
-        }
-        updateQRCode();
+        const rawTaxRate = parseFloat(document.getElementById('taxInput').value) || 0;
+        const taxRate = isNaN(rawTaxRate) ? 0 : rawTaxRate;
+        const taxNominal = Math.max(0, subtotal - discountNominal) * (taxRate / 100);
+        
+        const rawShipping = parseFloat(document.getElementById('shippingInput').value) || 0;
+        const shippingNominal = isNaN(rawShipping) ? 0 : rawShipping;
+        
+        const totalFinal = Math.max(0, (subtotal - discountNominal) + taxNominal + shippingNominal);
+        
+        const rawDp = parseFloat(document.getElementById('dpInput').value) || 0;
+        const dpNominal = isNaN(rawDp) ? 0 : rawDp;
+        const balanceDue = Math.max(0, totalFinal - dpNominal);
+        
+        document.getElementById('subtotalVal').innerText = formatRupiah(subtotal);
+        document.getElementById('discountTotalVal').innerText = "- " + formatRupiah(discountNominal);
+        document.getElementById('taxTotalVal').innerText = formatRupiah(taxNominal);
+        document.getElementById('totalFinalVal').innerText = formatRupiah(totalFinal);
+        document.getElementById('balanceDueVal').innerText = formatRupiah(balanceDue);
     }
 
-    function updateQRCode() {
-        const noNota = document.getElementById('nota-num').value || '-';
-        qrcode.clear(); 
-        qrcode.makeCode(noNota); 
+    function getLocalQueue() {
+        const queue = localStorage.getItem('yenyGordenOfflineQueue');
+        return queue ? JSON.parse(queue) : [];
     }
 
-    function simpanKeGoogleSheets(bukaCetakSetelahSelesai = false) {
-        const nota = document.getElementById('nota-num').value || '-';
+    function saveLocalQueue(queue) { localStorage.setItem('yenyGordenOfflineQueue', JSON.stringify(queue)); }
+    function getLocalCache() {
+        const cache = localStorage.getItem('yenyGordenOnlineCache');
+        return cache ? JSON.parse(cache) : [];
+    }
+    function saveLocalCache(cache) { localStorage.setItem('yenyGordenOnlineCache', JSON.stringify(cache)); }
+
+    function updateMergedHistory() {
+        const cache = getLocalCache();
+        const queue = getLocalQueue();
+        let merged = JSON.parse(JSON.stringify(cache));
         
-        const rows = document.getElementById('invoice-table').getElementsByTagName('tbody')[0].rows;
-        let detailItems = [];
-        for (let i = 0; i < rows.length; i++) {
-            const desc = rows[i].cells[0].querySelector('input').value || '';
-            const qty = parseFloat(rows[i].querySelector('.qty').value) || 0;
-            const price = parseFloat(rows[i].querySelector('.price').value) || 0;
-            detailItems.push({ desc, qty, price });
-        }
+        queue.forEach(item => {
+            const index = merged.findIndex(c => c.docNo.toLowerCase() === item.docNo.toLowerCase());
+            if (index > -1) { merged[index] = item; } else { merged.unshift(item); }
+        });
+        memoryDatabase = merged;
+        renderHistoryTable(merged);
+    }
 
-        const dataPayload = {
-            action: 'simpanNota',
-            nota: nota,
-            tanggal: document.getElementById('date-picker').value || '-',
-            nama: document.getElementById('client-name').value || '',
-            alamat: document.getElementById('client-address').value || '',
-            nohp: document.getElementById('client-phone').value || '',
-            proyek: document.getElementById('project-details').value || '',
-            items: JSON.stringify(detailItems),
-            subtotal: parseFloat(document.getElementById('subtotal').value) || 0,
-            diskon: document.getElementById('discount-amount').value || 0,
-            ppn: parseFloat(document.getElementById('ppn-rate').value) || 0,
-            ongkir: parseFloat(document.getElementById('shipping-cost').value) || 0,
-            dp: parseFloat(document.getElementById('dp-amount').value) || 0,
-            sisa: parseFloat(document.getElementById('balance-due').value) || 0,
-            status: isLunas ? "LUNAS" : "BELUM LUNAS (DP)",
-            kasir: namaKasirAktif
-        };
+    function renderHistoryTable(dataList) {
+        const tbody = document.getElementById('historyTableBody');
+        tbody.innerHTML = "";
 
-        const params = new URLSearchParams();
-        for (let key in dataPayload) { params.append(key, dataPayload[key]); }
-
-        // Simpan salinan lokal ke cache agar data di layar tidak hilang
-        localStorage.setItem('local_backup_' + nota, JSON.stringify(dataPayload));
-
-        if (!navigator.onLine) {
-            pushToOfflineQueue('nota', dataPayload);
-            if (bukaCetakSetelahSelesai) { window.print(); }
-            else { showCustomAlert("Offline", "Koneksi terputus! Nota disimpan di memori lokal & akan otomatis disinkronkan saat online."); }
+        if(dataList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="txt-center" style="color: #888;">Tidak ada data ditemukan.</td></tr>`;
             return;
         }
 
-        fetch(WEB_APP_URL, { method: "POST", body: params })
+        const queue = getLocalQueue();
+        dataList.forEach((data) => {
+            const isPending = queue.some(q => q.docNo.toLowerCase() === data.docNo.toLowerCase());
+            const statusLabel = isPending ? ' ⏳ (Lokal)' : '';
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${data.docNo}${statusLabel}</strong></td>
+                <td><span style="padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; background-color: ${data.docType==='INVOICE'?'#d4efdf':data.docType==='QUOTATION'?'#d6eaf8':'#fcf3cf'}; color: ${data.docType==='INVOICE'?'#196f3d':data.docType==='QUOTATION'?'#1f618d':'#b7950b'};">${data.docType}</span></td>
+                <td>${data.docDate}</td>
+                <td>${data.clientName}</td>
+                <td><strong>${formatRupiah(data.balanceDue)}</strong></td>
+                <td class="txt-center">
+                    <button class="btn btn-primary" style="padding: 4px 8px; font-size: 11px;" onclick="loadData('${data.docNo}')">Buka</button>
+                    <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="deleteLocalData('${data.docNo}')">Hapus</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function searchHistory() {
+        const input = document.getElementById('searchInput').value.trim().toLowerCase();
+        const loader = document.getElementById('searchLoader');
+        
+        const filtered = memoryDatabase.filter(item => {
+            return item.docNo.toLowerCase().includes(input) || 
+                   item.clientName.toLowerCase().includes(input) ||
+                   (item.clientInfo && item.clientInfo.toLowerCase().includes(input));
+        });
+        renderHistoryTable(filtered);
+
+        if (isOnline() && input.length >= 3 && !WEB_APP_URL.includes("SALIN_URL_APPS_SCRIPT")) {
+            clearTimeout(searchTimeout);
+            loader.style.display = "block";
+
+            searchTimeout = setTimeout(() => {
+                fetch(WEB_APP_URL + "?action=getAll")
+                .then(response => response.json())
+                .then(res => {
+                    if (res.status === "success") {
+                        saveLocalCache(res.data);
+                        const freshFiltered = res.data.filter(item => {
+                            return item.docNo.toLowerCase().includes(input) || 
+                                   item.clientName.toLowerCase().includes(input) ||
+                                   (item.clientInfo && item.clientInfo.toLowerCase().includes(input));
+                        });
+                        renderHistoryTable(freshFiltered);
+                    }
+                    loader.style.display = "none";
+                })
+                .catch(err => {
+                    console.error(err);
+                    loader.style.display = "none";
+                });
+            }, 500); 
+        }
+    }
+
+    function saveTransaction() {
+        const docType = document.getElementById('documentType').value;
+        const docNo = document.getElementById('docNo').value.trim();
+        const docDate = document.getElementById('docDate').value;
+        const paymentTerm = document.getElementById('paymentTerm').value;
+        const clientName = document.getElementById('clientName').value.trim();
+        const clientInfo = document.getElementById('clientInfo').value;
+        const discount = parseFloat(document.getElementById('discountInput').value) || 0;
+        const tax = parseFloat(document.getElementById('taxInput').value) || 0;
+        const shipping = parseFloat(document.getElementById('shippingInput').value) || 0;
+        const dp = parseFloat(document.getElementById('dpInput').value) || 0;
+        const docNotes = document.getElementById('docNotes').value;
+
+        if(!clientName || !docNo) {
+            tampilAlert('warning', 'DATA BELUM LENGKAP', 'Kolom Nama Pelanggan dan Nomor Dokumen wajib diisi terlebih dahulu sebelum disimpan.');
+            return;
+        }
+
+        const items = [];
+        const rows = document.querySelectorAll('#tableBody tr');
+        rows.forEach(row => {
+            const inputs = row.querySelectorAll('input');
+            if(inputs.length >= 3) {
+                const q = parseFloat(inputs[1].value) || 0;
+                const p = parseFloat(inputs[2].value) || 0;
+                items.push({
+                    desc: inputs[0].value,
+                    qty: q,
+                    price: p,
+                    total: q * p
+                });
+            }
+        });
+
+        let subtotal = 0;
+        items.forEach(it => subtotal += it.total);
+        let discountNominal = discount <= 99 ? (subtotal * (discount / 100)) : discount;
+        if(discountNominal > subtotal) discountNominal = subtotal;
+        
+        const taxNominal = Math.max(0, subtotal - discountNominal) * (tax / 100);
+        const totalFinal = Math.max(0, (subtotal - discountNominal) + taxNominal + shipping);
+        const balanceDue = Math.max(0, totalFinal - dp);
+
+        const currentData = { 
+            docType, docNo, docDate, paymentTerm, clientName, clientInfo, 
+            discount, tax, shipping, dp, docNotes, items, subtotal, totalFinal, balanceDue 
+        };
+
+        let queue = getLocalQueue();
+        const existingIndex = queue.findIndex(item => item.docNo.toLowerCase() === docNo.toLowerCase());
+        
+        if (existingIndex >= 0) { queue[existingIndex] = currentData; } else { queue.unshift(currentData); }
+        
+        saveLocalQueue(queue);
+        updateMergedHistory();
+
+        const docNoField = document.getElementById('docNo');
+        docNoField.readOnly = true;
+        docNoField.style.backgroundColor = "";
+        docNoField.style.border = "";
+
+        if (isOnline()) { syncOfflineData(); } else {
+            tampilAlert('success', 'DISIMPAN KE LOKAL', '💾 Transaksi berhasil disimpan di memori browser Anda.\n\nSistem akan otomatis mengirimkannya ke Google Sheets setelah HP Anda kembali mendapatkan koneksi internet!');
+        }
+    }
+
+    function syncOfflineData() {
+        if (!isOnline() || WEB_APP_URL.includes("SALIN_URL_APPS_SCRIPT")) return;
+        
+        const queue = getLocalQueue();
+        if (queue.length === 0) { fetchOnlineData(); return; }
+
+        const itemToSend = queue[queue.length - 1]; 
+
+        fetch(WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: "saveOrUpdate", data: itemToSend })
+        })
+        .then(() => {
+            let currentQueue = getLocalQueue();
+            currentQueue = currentQueue.filter(item => item.docNo.toLowerCase() !== itemToSend.docNo.toLowerCase());
+            saveLocalQueue(currentQueue);
+
+            if (currentQueue.length > 0) { syncOfflineData(); } else { fetchOnlineData(); }
+        })
+        .catch(err => console.log(err));
+    }
+
+    function fetchOnlineData() {
+        if (!isOnline() || WEB_APP_URL.includes("SALIN_URL_APPS_SCRIPT")) return;
+
+        fetch(WEB_APP_URL + "?action=getAll")
         .then(response => response.json())
         .then(res => {
-            if (bukaCetakSetelahSelesai) { window.print(); } 
-            else { showCustomAlert("Sukses", res.result === "updated" ? "Data Nota " + nota + " Berhasil Diperbarui!" : "Sukses Disimpan ke Sheets."); }
+            if (res.status === "success") {
+                saveLocalCache(res.data);
+                updateMergedHistory();
+            }
         })
-        .catch(err => {
-            pushToOfflineQueue('nota', dataPayload);
-            if (bukaCetakSetelahSelesai) { window.print(); } 
-            else { showCustomAlert("Offline Terdeteksi", "Gagal mengirim ke Sheets. Data aman tersimpan di memori browser Anda."); }
-        });
+        .catch(err => console.log(err));
     }
 
-    function simpanLaluCetak() { simpanKeGoogleSheets(true); }
+    function loadData(docNo) {
+        const data = memoryDatabase.find(item => item.docNo.toLowerCase() === docNo.toLowerCase());
+        if(!data) return;
 
-    function renderDataKeLayar(data) {
-        document.getElementById('nota-num').value = data.nota;
-        document.getElementById('date-picker').value = data.tanggal;
-        document.getElementById('client-name').value = data.nama;
-        document.getElementById('client-address').value = data.alamat || '';
-        document.getElementById('client-phone').value = data.nohp || '';
-        document.getElementById('project-details').value = data.proyek || '';
-        document.getElementById('discount-amount').value = data.diskon || 0;
-        document.getElementById('ppn-rate').value = data.ppn || 0;
-        document.getElementById('shipping-cost').value = data.ongkir || 0;
-        document.getElementById('dp-amount').value = data.dp;
+        document.getElementById('documentType').value = data.docType;
+        document.getElementById('docNo').value = data.docNo;
+        document.getElementById('docNo').readOnly = true; 
+        document.getElementById('docNo').style.backgroundColor = ""; 
+        document.getElementById('docNo').style.border = "";
+        document.getElementById('docDate').value = data.docDate;
+        document.getElementById('paymentTerm').value = data.paymentTerm || "Tunai / Transfer Bank";
+        document.getElementById('clientName').value = data.clientName;
+        document.getElementById('clientInfo').value = data.clientInfo;
+        
+        document.getElementById('discountInput').value = data.discount || 0;
+        document.getElementById('taxInput').value = data.tax || 0;
+        document.getElementById('shippingInput').value = data.shipping || 0;
+        document.getElementById('dpInput').value = data.dp || 0;
+        document.getElementById('docNotes').value = data.docNotes || "";
 
-        const tableBody = document.getElementById('invoice-table').getElementsByTagName('tbody')[0];
+        const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = "";
         
-        if (data.items) {
-            const listItems = JSON.parse(data.items);
-            listItems.forEach(item => {
-                const row = tableBody.insertRow();
-                row.innerHTML = `
-                    <td><input type="text" value="${item.desc}" placeholder="Deskripsi Pesanan"></td>
-                    <td class="align-right"><input type="number" class="qty" value="${item.qty}" min="0" oninput="calculateTotal()"></td>
-                    <td class="align-right"><input type="number" class="price" value="${item.price}" min="0" oninput="calculateTotal()"></td>
-                    <td class="align-right"><input type="number" class="row-total" value="${item.qty * item.price}" readonly></td>
-                    <td class="td-action"><button class="btn btn-delete" onclick="removeRow(this)">Hapus</button></td>
+        if (data.items && data.items.length > 0) {
+            data.items.forEach((item, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="txt-center">${idx + 1}</td>
+                    <td><input type="text" class="input-item" value="${item.desc}"></td>
+                    <td><input type="number" class="input-item txt-center qty" value="${item.qty}" oninput="calculateTotal()"></td>
+                    <td><input type="number" class="input-item txt-right row-total-input" value="${item.price}" oninput="calculateTotal()"></td>
+                    <td class="txt-center btn-action"><button class="btn btn-danger" onclick="deleteRow(this)">X</button></td>
                 `;
+                tableBody.appendChild(tr);
             });
         } else {
-            addNewRow();
+            addRow();
         }
-        calculateTotal();
+
+        updateDocType(false);
+        sinkronNamaPelanggan();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // --- KONTROL UNTUK MENU FLOATING PEMBAYARAN TERMIN ---
-    function openFloatingPayment(data) {
-        const sisa = parseFloat(data.sisa) || 0;
-        if (sisa <= 0) {
-            showCustomAlert("Selesai", "Nota ini sudah LUNAS.");
-            return;
-        }
+    function deleteLocalData(docNo) {
+        if(confirm("Hapus data transaksi ini dari memori lokal Anda?")) {
+            let queue = getLocalQueue();
+            queue = queue.filter(item => item.docNo.toLowerCase() !== docNo.toLowerCase());
+            saveLocalQueue(queue);
 
-        dataNotaTerpilih = data;
-        document.getElementById('float-nota-text').innerText = data.nota;
-        document.getElementById('float-sisa-tagihan').innerText = sisa.toLocaleString('id-ID');
-        document.getElementById('float-input-nominal').value = sisa; 
-        document.getElementById('float-input-termin').value = "2"; 
+            let cache = getLocalCache();
+            cache = cache.filter(item => item.docNo.toLowerCase() !== docNo.toLowerCase());
+            saveLocalCache(cache);
+
+            updateMergedHistory();
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('clientName').value = "";
+        document.getElementById('clientInfo').value = "";
+        document.getElementById('discountInput').value = "0";
+        document.getElementById('taxInput').value = "0";
+        document.getElementById('shippingInput').value = "0";
+        document.getElementById('dpInput').value = "0";
+        document.getElementById('customerNameInput').value = "";
+        document.getElementById('ownerNameInput').value = "Yeny Gorden";
         
-        document.getElementById('floating-payment-modal').style.display = "flex";
-    }
-
-    function closeFloatingPayment() {
-        document.getElementById('floating-payment-modal').style.display = "none";
-        dataNotaTerpilih = null;
-    }
-
-    function prosesBayarFloating() {
-        if (!dataNotaTerpilih) return;
-
-        const inputNominal = document.getElementById('float-input-nominal').value;
-        const inputTermin = document.getElementById('float-input-termin').value;
-
-        if (!inputNominal || isNaN(inputNominal) || parseFloat(inputNominal) <= 0) {
-            showCustomAlert("Peringatan", "Masukkan nominal pembayaran yang valid!");
-            return;
-        }
-
-        const nominalBayar = parseFloat(inputNominal);
-        const noTermin = inputTermin || "2";
-        const scannedNota = dataNotaTerpilih.nota;
-
-        closeFloatingPayment();
-
-        const dataCicilanPayload = {
-            action: 'simpanCicilan',
-            nota: scannedNota,
-            nominal: nominalBayar,
-            terminKe: noTermin,
-            kasir: namaKasirAktif
-        };
-
-        // Perbarui simulasi angka di layar secara offline terlebih dahulu
-        let dpLama = parseFloat(document.getElementById('dp-amount').value) || 0;
-        let sisaLama = parseFloat(document.getElementById('balance-due').value) || 0;
-        let dpBaru = dpLama + nominalBayar;
-        let sisaBaru = sisaLama - nominalBayar;
-        if(sisaBaru < 0) sisaBaru = 0;
-
-        document.getElementById('dp-amount').value = dpBaru;
-        document.getElementById('balance-due').value = sisaBaru;
-        calculateTotal();
-
-        if (!navigator.onLine) {
-            pushToOfflineQueue('cicilan', dataCicilanPayload);
-            showCustomAlert("Offline", "Koneksi terputus! Pembayaran dicatat lokal dan akan disinkronkan otomatis saat sinyal kembali.");
-            return;
-        }
-
-        showCustomAlert("Memproses", "Sedang menyimpan pembayaran cicilan...");
-        const paramsCicilan = new URLSearchParams();
-        for (let key in dataCicilanPayload) { paramsCicilan.append(key, dataCicilanPayload[key]); }
-
-        fetch(WEB_APP_URL, { method: "POST", body: paramsCicilan })
-        .then(res => res.json())
-        .then(resCicil => {
-            if(resCicil.status === "success") {
-                document.getElementById('dp-amount').value = resCicil.dpAktif;
-                document.getElementById('balance-due').value = resCicil.sisaAktif;
-                calculateTotal();
-                showCustomAlert("Sukses", "Pembayaran cicilan aman masuk ke jurnal riwayat!");
-            } else {
-                showCustomAlert("Gagal", resCicil.message);
-            }
-        })
-        .catch(err => {
-            pushToOfflineQueue('cicilan', dataCicilanPayload);
-            showCustomAlert("Offline Terdeteksi", "Gagal sinkron. Transaksi diamankan ke antrean offline.");
-        });
-    }
-
-    function cariNotaManual() {
-        const noNota = document.getElementById('search-nota').value.trim();
-        if (!noNota) { showCustomAlert("Peringatan", "Masukkan nomor nota!"); return; }
-
-        // Jika offline, coba cari dari backup lokal yang pernah disimpan di perangkat ini
-        if (!navigator.onLine) {
-            const localBackup = localStorage.getItem('local_backup_' + noNota);
-            if (localBackup) {
-                const dataObj = JSON.parse(localBackup);
-                renderDataKeLayar(dataObj);
-                setTimeout(() => { openFloatingPayment(dataObj); }, 500);
-                return;
-            }
-        }
-
-        const params = new URLSearchParams();
-        params.append('action', 'getNota');
-        params.append('nota', noNota);
-
-        fetch(WEB_APP_URL, { method: "POST", body: params })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "found") {
-                renderDataKeLayar(data);
-                // Simpan cache lokal untuk dibaca jika sewaktu-waktu offline
-                localStorage.setItem('local_backup_' + data.nota, JSON.stringify(data));
-                setTimeout(() => { openFloatingPayment(data); }, 500);
-            } else {
-                showCustomAlert("Tidak Ditemukan", "Nomor nota tidak terdaftar.");
-            }
-        }).catch(err => {
-            // Fallback backup lokal jika gagal fetch di tengah jalan akibat gangguan sinyal
-            const localBackup = localStorage.getItem('local_backup_' + noNota);
-            if (localBackup) {
-                const dataObj = JSON.parse(localBackup);
-                renderDataKeLayar(dataObj);
-                setTimeout(() => { openFloatingPayment(dataObj); }, 500);
-            } else {
-                showCustomAlert("Error", "Gagal menarik data. Koneksi internet bermasalah.");
-            }
-        });
-    }
-
-    function toggleScanner() {
-        const area = document.getElementById('scanner-area');
-        if (area.style.display === 'block') {
-            area.style.display = 'none';
-            if (html5QrcodeScanner) html5QrcodeScanner.stop().catch(() => {});
-        } else {
-            area.style.display = 'block';
-            runScanner();
-        }
-    }
-
-    function runScanner() {
-        html5QrcodeScanner = new Html5Qrcode("reader");
-        html5QrcodeScanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
-            qrCodeMessage => {
-                try {
-                    const scannedNota = qrCodeMessage.trim();
-                    if (scannedNota) {
-                        html5QrcodeScanner.stop().then(() => { document.getElementById('scanner-area').style.display = 'none'; });
-                        
-                        if (!navigator.onLine) {
-                            const localBackup = localStorage.getItem('local_backup_' + scannedNota);
-                            if (localBackup) {
-                                const dataObj = JSON.parse(localBackup);
-                                renderDataKeLayar(dataObj);
-                                setTimeout(() => { openFloatingPayment(dataObj); }, 500);
-                                return;
-                            }
-                        }
-
-                        const params = new URLSearchParams();
-                        params.append('action', 'getNota');
-                        params.append('nota', scannedNota);
-
-                        fetch(WEB_APP_URL, { method: "POST", body: params })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.status === "found") {
-                                renderDataKeLayar(data);
-                                localStorage.setItem('local_backup_' + data.nota, JSON.stringify(data));
-                                setTimeout(() => { openFloatingPayment(data); }, 500);
-                            } else {
-                                showCustomAlert("Gagal", "Nota tidak ditemukan.");
-                            }
-                        });
-                    }
-                } catch (e) {}
-            }, () => {}
-        ).catch(err => { showCustomAlert("Kamera Error", "Gagal akses kamera."); });
-    }
-
-    // --- ENGINE MANAJEMEN ANTREAN OFFLINE ---
-    function pushToOfflineQueue(type, payload) {
-        let queue = JSON.parse(localStorage.getItem('offline_payment_queue')) || [];
-        queue.push({ type, payload, timestamp: new Date().getTime() });
-        localStorage.setItem('offline_payment_queue', JSON.stringify(queue));
-    }
-
-    function syncPendingData() {
-        let queue = JSON.parse(localStorage.getItem('offline_payment_queue')) || [];
-        if (queue.length === 0) return;
-
-        console.log("Menemukan " + queue.length + " data tertunda. Memulai sinkronisasi otomatis...");
+        const tableBody = document.getElementById('tableBody');
+        tableBody.innerHTML = `
+            <tr>
+                <td class="txt-center">1</td>
+                <td><input type="text" class="input-item" placeholder="Contoh: Ruang Tamu - Jendela Utama (Kain+Rel+Vitrase)"></td>
+                <td><input type="number" class="input-item txt-center qty" value="1" oninput="calculateTotal()"></td>
+                <td><input type="number" class="input-item txt-right row-total-input" value="0" oninput="calculateTotal()"></td>
+                <td class="txt-center btn-action"><button class="btn btn-danger" onclick="deleteRow(this)">X</button></td>
+            </tr>
+        `;
+        document.getElementById('documentType').value = "ESTIMATE";
         
-        // Ambil item pertama dari antrean untuk dikirim
-        let currentItem = queue[0];
-        const params = new URLSearchParams();
-        for (let key in currentItem.payload) { params.append(key, currentItem.payload[key]); }
-
-        fetch(WEB_APP_URL, { method: "POST", body: params })
-        .then(res => res.json())
-        .then(result => {
-            // Jika sukses terkirim, hapus dari antrean lokal
-            queue.shift();
-            localStorage.setItem('offline_payment_queue', JSON.stringify(queue));
-            
-            // Rekursif jalankan lagi sampai antrean habis
-            if(queue.length > 0) {
-                syncPendingData();
-            } else {
-                showCustomAlert("Sinkronisasi Berhasil", "Semua transaksi offline yang tertunda telah berhasil disimpan ke Google Sheets!");
-                calculateTotal();
-            }
-        })
-        .catch(err => {
-            console.log("Gagal sinkronisasi otomatis, internet belum stabil. Mencoba lagi nanti.");
-        });
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        let mm = today.getMonth() + 1;
+        let dd = today.getDate();
+        if (dd < 10) dd = '0' + dd;
+        if (mm < 10) mm = '0' + mm;
+        document.getElementById('docDate').value = yyyy + '-' + mm + '-' + dd;
+        document.getElementById('docNo').value = "";
+        document.getElementById('docNo').style.backgroundColor = "";
+        document.getElementById('docNo').style.border = "";
+        
+        clearCustomerCanvas();
+        updateDocType(true);
     }
+
+    window.onload = function() {
+        updateConnectionStatus();
+        updateDocType(true);
+        updateMergedHistory();
+        setupCanvasSize();
+        
+        setInterval(fetchOnlineData, 25000);
+    };
 </script>
+<!-- Menghubungkan ke Manifest -->
+<link rel="manifest" href="manifest.json">
+
+<script>
+  // Mendaftarkan Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then((reg) => console.log('Service Worker berhasil didaftarkan!', reg.scope))
+        .catch((err) => console.error('Pendaftaran Service Worker gagal:', err));
+    });
+  }
+</script>
+
+
 </body>
 </html>
